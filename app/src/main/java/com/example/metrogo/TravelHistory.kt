@@ -31,6 +31,12 @@ class TravelHistory : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val circleNotification = findViewById<FrameLayout>(R.id.circleNotification)
+        circleNotification.setOnClickListener{
+            val intent = Intent(this , NotificationPage::class.java)
+            startActivity(intent)
+        }
+
         val circleProfile = findViewById<FrameLayout>(R.id.circleProfile)
         circleProfile.setOnClickListener {
             val intent = Intent(this, ProfileManagement::class.java)

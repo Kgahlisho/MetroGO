@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MetroGO">
         <activity
+            android:name=".NotificationPage"
+            android:exported="false" />
+        <activity
             android:name=".ProfileManagement"
             android:exported="false" />
         <activity

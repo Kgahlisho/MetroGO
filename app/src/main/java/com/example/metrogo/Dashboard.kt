@@ -33,6 +33,12 @@ class Dashboard : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val circleNotification = findViewById<FrameLayout>(R.id.circleNotification)
+        circleNotification.setOnClickListener{
+            val intent = Intent(this , NotificationPage::class.java)
+            startActivity(intent)
+        }
+
         val pillPurchaseTicket = findViewById<LinearLayout>(R.id.pillPurchaseTicket)
         pillPurchaseTicket.setOnClickListener{
             val intent = Intent(this, PurchaseTicket::class.java)

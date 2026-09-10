@@ -68,6 +68,7 @@
         </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/circleNotification"
             android:layout_width="34dp"
             android:layout_height="34dp"
             android:background="@drawable/bg_circle_lime"
@@ -88,12 +89,25 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
 <androidx.constraintlayout.widget.ConstraintLayout
     android:id="@+id/welcomeCard"
     android:layout_width="0dp"
     android:layout_height="180dp"
-    android:layout_marginTop="20dp"
+    android:layout_marginTop="50dp"
     android:layout_marginStart="16dp"
     android:layout_marginEnd="16dp"
     android:background="@drawable/bg_card_white"
@@ -235,8 +249,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/pillWallet"
         app:layout_constraintTop_toBottomOf="@+id/boardingPass"
-        app:layout_constraintHorizontal_weight="1">
-
+      >
         <FrameLayout
             android:layout_width="26dp"
             android:layout_height="26dp"
@@ -254,6 +267,7 @@
             android:textColor="@color/teal_dark"
             android:textSize="12sp"
             android:textStyle="bold" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -272,7 +286,7 @@
         app:layout_constraintStart_toEndOf="@+id/pillTravelHistory"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/boardingPass"
-        app:layout_constraintHorizontal_weight="1">
+       >
 
         <FrameLayout
 
@@ -311,8 +325,7 @@
         android:paddingHorizontal="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/pillJourneyPlanner"
-        app:layout_constraintTop_toBottomOf="@+id/pillTravelHistory"
-        app:layout_constraintHorizontal_weight="1">
+        app:layout_constraintTop_toBottomOf="@+id/pillTravelHistory">
 
         <FrameLayout
 
@@ -355,8 +368,7 @@
         app:layout_constraintStart_toEndOf="@+id/pillPurchaseTicket"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pillWallet"
-        app:layout_constraintHorizontal_weight="1">
-
+       >
 
         <FrameLayout
 
@@ -395,8 +407,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pillJourneyPlanner"></androidx.cardview.widget.CardView>
+        app:layout_constraintTop_toBottomOf="@id/pillJourneyPlanner"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
 
+</androidx.constraintlayout.widget.ConstraintLayout>
 

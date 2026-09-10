@@ -32,6 +32,12 @@ class PurchaseTicket : AppCompatActivity() {
             startActivity(intent)
         }
 
+        val circleNotification = findViewById<FrameLayout>(R.id.circleNotification)
+        circleNotification.setOnClickListener{
+            val intent = Intent(this , NotificationPage::class.java)
+            startActivity(intent)
+        }
+
         val btnback = findViewById<ImageButton>(R.id.btnBack)
         btnback.setOnClickListener {
             finish()
