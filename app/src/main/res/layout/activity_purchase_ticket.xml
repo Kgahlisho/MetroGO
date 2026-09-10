@@ -21,12 +21,16 @@
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="11dp"
+            android:layout_marginBottom="11dp"
             android:text="MetroGO"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            tools:layout_editor_absoluteX="50dp"
-            tools:layout_editor_absoluteY="15dp" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
             android:id="@+id/circleProfile"
@@ -60,8 +64,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="&#9881;"
-                android:textSize="18sp"
-                android:textColor="@color/teal_dark" />
+                android:textSize="25sp"
+                android:textColor="@color/white" />
         </FrameLayout>
 
         <FrameLayout
@@ -74,13 +78,12 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginEnd="10dp">
 
-            <TextView
+            <ImageView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center"
-                android:text="&#128276;"
-                android:textSize="14sp"
-                android:textColor="@color/teal_dark" />
+                android:src="@drawable/ic_notification_bell"
+                app:tint="@color/white" />
         </FrameLayout>
 
         <ImageButton
@@ -91,9 +94,9 @@
             android:contentDescription="Back"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="16dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -103,12 +106,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginStart="125dp"
+        android:layout_marginTop="46dp"
+        android:layout_marginEnd="126dp"
         android:text="Purchase Ticket"
         android:textColor="@color/teal_primary"
         android:textSize="22sp"
         android:textStyle="bold"
-        tools:layout_editor_absoluteX="125dp"
-        tools:layout_editor_absoluteY="102dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBar" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

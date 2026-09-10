@@ -1,8 +1,10 @@
 package com.example.metrogo
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -31,6 +33,18 @@ class JourneyPlanner : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        val circleSettings = findViewById<FrameLayout>(R.id.circleSettings)
+        circleSettings.setOnClickListener {
+            intent = Intent(this, SettingsPage::class.java)
+            startActivity(intent)
+        }
+
+        val circleProfile = findViewById<FrameLayout>(R.id.circleProfile)
+        circleProfile.setOnClickListener {
+            val intent = Intent(this, ProfileManagement::class.java)
+            startActivity(intent)
         }
 
         // Initialize views
@@ -72,13 +86,14 @@ class JourneyPlanner : AppCompatActivity() {
         }
 
         // Back button
-        btnBack.setOnClickListener {
+        val btnback = findViewById<ImageButton>(R.id.btnBack)
+        btnback.setOnClickListener {
             finish()
         }
     }
 
     private fun showStationSelectionDialog(type: String) {
-        // Sample stations - in a real app, you'd fetch from API or database
+        // Sample stations - before implementing an  API or database
         val stations = arrayOf(
             "Park Station",
             "Sandton Station",
@@ -90,7 +105,7 @@ class JourneyPlanner : AppCompatActivity() {
             "OR Tambo Station"
         )
 
-        // Show a simple selection dialog
+        //  selection dialog
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Select $type Station")
             .setItems(stations) { _, which ->

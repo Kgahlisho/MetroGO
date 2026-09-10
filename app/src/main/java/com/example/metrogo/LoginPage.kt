@@ -23,7 +23,7 @@ class LoginPage : AppCompatActivity() {
         LoginToDash.setOnClickListener {
             val intent = Intent(this, Dashboard::class.java)
             startActivity(intent)
-
+        }
             val SignUpTwo = findViewById<Button>(R.id.SignUpTwo)
             SignUpTwo.setOnClickListener {
                 val  intent = Intent(this, RegisterPage::class.java)
@@ -32,4 +32,3 @@ class LoginPage : AppCompatActivity() {
             }
         }
     }
-}

@@ -23,13 +23,16 @@
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="11dp"
+            android:layout_marginBottom="11dp"
             android:text="MetroGO"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnBack"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
             android:id="@+id/circleProfile"
@@ -63,8 +66,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="&#9881;"
-                android:textSize="18sp"
-                android:textColor="@color/teal_dark" />
+                android:textSize="25sp"
+                android:textColor="@color/white" />
         </FrameLayout>
 
         <FrameLayout
@@ -77,13 +80,12 @@
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginEnd="10dp">
 
-            <TextView
+            <ImageView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center"
-                android:text="&#128276;"
-                android:textSize="14sp"
-                android:textColor="@color/teal_dark" />
+                android:src="@drawable/ic_notification_bell"
+                app:tint="@color/white" />
         </FrameLayout>
 
 
@@ -91,14 +93,15 @@
             android:id="@+id/btnBack"
             android:layout_width="34dp"
             android:layout_height="34dp"
+            android:layout_marginTop="11dp"
+            android:layout_marginBottom="11dp"
             android:background="@drawable/bg_circle_outline_white"
             android:contentDescription="Back"
             android:padding="8dp"
             android:src="@drawable/ic_arrow_back"
-            app:layout_constraintStart_toEndOf="@id/tvAppName"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="16dp" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -120,8 +123,6 @@
             android:paddingHorizontal="20dp"
             android:paddingTop="20dp"
             android:paddingBottom="32dp">
-
-            <!-- Title -->
 
             <TextView
                 android:id="@+id/tvTitle"

@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MetroGO">
         <activity
+            android:name=".ProfileManagement"
+            android:exported="false" />
+        <activity
+            android:name=".SettingsPage"
+            android:exported="false" />
+        <activity
             android:name=".PurchaseTicket"
             android:exported="false" />
         <activity

@@ -20,10 +20,10 @@ class RegisterPage : AppCompatActivity() {
         }
 
         val LoginToLogin = findViewById<Button>(R.id.LoginToLogin)
-        LoginToLogin.setOnClickListener{
+        LoginToLogin.setOnClickListener {
             val intent = Intent(this, LoginPage::class.java)
             startActivity(intent)
-
+        }
             val SignUpThree = findViewById<Button>(R.id.SignUpThree)
             SignUpThree.setOnClickListener {
                 val intent = Intent(this, LoginPage::class.java)
@@ -31,4 +31,3 @@ class RegisterPage : AppCompatActivity() {
             }
         }
     }
-}
