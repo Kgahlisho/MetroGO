@@ -8,5 +8,8 @@
     <color name="lime_soft">#D6ED8F</color>
     <color name="lime_bright">#9ED84D</color>
     <color name="text_dark_teal">#0E6B78</color>
-
+    <color name="red_danger">#E5342B</color>
+    <color name="input_gray">#EDEDED</color>
+    <color name="divider_gray">#E2E2E2</color>
+    <color name="text_gray">#555555</color>
 </resources>

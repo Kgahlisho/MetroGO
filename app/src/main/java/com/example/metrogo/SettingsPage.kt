@@ -2,9 +2,13 @@ package com.example.metrogo
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -43,6 +47,44 @@ class SettingsPage : AppCompatActivity() {
             finish()
         }
 
+        val rowProfileManagement = findViewById<LinearLayout>(R.id.rowProfileManagement)
+        rowProfileManagement.setOnClickListener {
+         val intent = Intent(this, ProfileManagement::class.java)
+       startActivity(intent)
+        }
 
+        val rowNotifications = findViewById<LinearLayout>(R.id.rowNotifications)
+        rowNotifications.setOnClickListener {
+            intent = Intent(this, NotificationPage::class.java)
+            startActivity(intent)
+
+        }
+
+
+        val rowPreferences = findViewById<LinearLayout>(R.id.rowPreferences)
+        rowPreferences.setOnClickListener {
+            startActivity(Intent(this, PreferencesPage::class.java))
+        }
+
+        val rowHelpFaqs = findViewById<LinearLayout>(R.id.rowHelpFaqs)
+        rowHelpFaqs.setOnClickListener {
+            Toast.makeText(this, "Help & FAQs is coming soon", Toast.LENGTH_SHORT).show()
+        }
+
+        // Log Out button: confirm, then clear the back stack and return to LoginPage
+        val btnLogOut = findViewById<Button>(R.id.btnLogOut)
+        btnLogOut.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Log Out")
+                .setMessage("Are you sure you want to log out of MetroGO?")
+                .setPositiveButton("Log Out") { _, _ ->
+                    val loginIntent = Intent(this, LoginPage::class.java)
+                    loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(loginIntent)
+                    finish()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
     }
 }
