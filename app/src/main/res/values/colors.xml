@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="teal_primary">#17A9BA</color>
-    <color name="teal_dark">#0E7C89</color>
-    <color name="lime_green">#C7E576</color>
-    <color name="lime_soft">#D6ED8F</color>
-    <color name="lime_bright">#9ED84D</color>
-    <color name="text_dark_teal">#0E6B78</color>
-    <color name="red_danger">#E5342B</color>
-    <color name="input_gray">#EDEDED</color>
-    <color name="divider_gray">#E2E2E2</color>
-    <color name="text_gray">#555555</color>
+    <!-- Core -->
+    <color name="black">#FFFFFFFF</color>
+    <color name="white">#121212</color>
+    <color name="teal_primary">#3FC9DA</color>
+    <color name="teal_dark">#17A9BA</color>
+    <color name="lime_green">#A8C46A</color>
+    <color name="lime_soft">#8FAE55</color>
+    <color name="lime_bright">#C7E576</color>
+    <color name="text_dark_teal">#7FE0EC</color>
+    <color name="red_danger">#FF6B61</color>
+    <color name="input_gray">#1E1E1E</color>
+
+    <color name="divider_gray">#2C2C2C</color>
+    <color name="text_gray">#B0B0B0</color>
 </resources>

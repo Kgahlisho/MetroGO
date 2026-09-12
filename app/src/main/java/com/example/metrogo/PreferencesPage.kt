@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
@@ -24,6 +25,17 @@ class PreferencesPage : AppCompatActivity() {
     private val textSizes = arrayOf("Small", "Medium", "Large")
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        //checks the right color when changed making sure that applied changes made are applied
+
+        prefs = getSharedPreferences("metrogo_prefs", MODE_PRIVATE)
+        AppCompatDelegate.setDefaultNightMode(
+            if (prefs.getBoolean("dark_theme",false))
+                AppCompatDelegate.MODE_NIGHT_YES
+                else
+                    AppCompatDelegate.MODE_NIGHT_NO
+        )
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_preferences_page)
@@ -56,7 +68,7 @@ class PreferencesPage : AppCompatActivity() {
             finish()
         }
 
-        // --- App Language ---
+        // We are going to need an API to make sure that the application can atleast translate into 2 South african languages
         val tvLanguageValue = findViewById<TextView>(R.id.tvLanguageValue)
         tvLanguageValue.text = prefs.getString("app_language", "English")
 
@@ -76,20 +88,19 @@ class PreferencesPage : AppCompatActivity() {
                 .show()
         }
 
-        // --- App Theme (Light / Dark) ---
+        // The App will be able to change its  Theme (Light / Dark)
         val switchTheme = findViewById<Switch>(R.id.switchTheme)
+
         switchTheme.isChecked = prefs.getBoolean("dark_theme", false)
+
+
         switchTheme.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("dark_theme", isChecked).apply()
-            // TODO: apply via AppCompatDelegate.setDefaultNightMode(...) once a dark theme is defined
-            Toast.makeText(
-                this,
-                if (isChecked) "Dark theme enabled" else "Light theme enabled",
-                Toast.LENGTH_SHORT
-            ).show()
+
+            AppCompatDelegate.setDefaultNightMode(if (isChecked) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO)
         }
 
-        // --- Text Size ---
+        // The app will be able to changes its Text Size
         val tvTextSizeValue = findViewById<TextView>(R.id.tvTextSizeValue)
         tvTextSizeValue.text = prefs.getString("text_size", "Medium")
 
@@ -109,7 +120,7 @@ class PreferencesPage : AppCompatActivity() {
                 .show()
         }
 
-        // --- High Contrast Mode ---
+        //  High Contrast Mode
         val switchHighContrast = findViewById<Switch>(R.id.switchHighContrast)
         switchHighContrast.isChecked = prefs.getBoolean("high_contrast", false)
         switchHighContrast.setOnCheckedChangeListener { _, isChecked ->
@@ -117,7 +128,7 @@ class PreferencesPage : AppCompatActivity() {
             // TODO: apply a high-contrast color scheme once one is defined
         }
 
-        // --- Reduce Motion ---
+        // Reduce Motion
         val switchReduceMotion = findViewById<Switch>(R.id.switchReduceMotion)
         switchReduceMotion.isChecked = prefs.getBoolean("reduce_motion", true)
         switchReduceMotion.setOnCheckedChangeListener { _, isChecked ->

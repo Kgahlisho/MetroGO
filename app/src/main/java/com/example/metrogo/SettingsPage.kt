@@ -68,7 +68,8 @@ class SettingsPage : AppCompatActivity() {
 
         val rowHelpFaqs = findViewById<LinearLayout>(R.id.rowHelpFaqs)
         rowHelpFaqs.setOnClickListener {
-            Toast.makeText(this, "Help & FAQs is coming soon", Toast.LENGTH_SHORT).show()
+            intent = Intent(this, HelpPage::class.java)
+            startActivity(intent)
         }
 
         // Log Out button: confirm, then clear the back stack and return to LoginPage
