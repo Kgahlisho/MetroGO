@@ -129,7 +129,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- Card containing the preference rows -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cardPreferences"
                 android:layout_width="0dp"
@@ -141,12 +140,14 @@
                 android:background="@drawable/bg_card_white"
                 android:elevation="2dp"
                 android:paddingVertical="4dp"
-                app:layout_constraintTop_toBottomOf="@id/tvTitle"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvTitle"
+                app:layout_constraintVertical_bias="0.18">
 
-                <!-- App Language -->
+
                 <LinearLayout
                     android:id="@+id/rowLanguage"
                     android:layout_width="0dp"
@@ -158,9 +159,9 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="18dp"
                     android:paddingVertical="16dp"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <TextView
                         android:layout_width="0dp"
@@ -193,11 +194,11 @@
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:background="@color/divider_gray"
-                    app:layout_constraintTop_toBottomOf="@id/rowLanguage"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/rowLanguage" />
 
-                <!-- App Theme -->
+
                 <LinearLayout
                     android:id="@+id/rowTheme"
                     android:layout_width="0dp"
@@ -206,9 +207,9 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="18dp"
                     android:paddingVertical="10dp"
-                    app:layout_constraintTop_toBottomOf="@id/divider1"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintTop_toBottomOf="@id/divider1">
 
                     <TextView
                         android:layout_width="0dp"
@@ -232,11 +233,11 @@
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:background="@color/divider_gray"
-                    app:layout_constraintTop_toBottomOf="@id/rowTheme"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/rowTheme" />
 
-                <!-- Text Size -->
+
                 <LinearLayout
                     android:id="@+id/rowTextSize"
                     android:layout_width="0dp"
@@ -248,9 +249,9 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="18dp"
                     android:paddingVertical="16dp"
-                    app:layout_constraintTop_toBottomOf="@id/divider2"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintTop_toBottomOf="@id/divider2">
 
                     <TextView
                         android:layout_width="0dp"
@@ -283,11 +284,11 @@
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:background="@color/divider_gray"
-                    app:layout_constraintTop_toBottomOf="@id/rowTextSize"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toBottomOf="@id/rowTextSize" />
 
-                <!-- High Contrast Mode -->
+
                 <LinearLayout
                     android:id="@+id/rowHighContrast"
                     android:layout_width="0dp"
@@ -296,9 +297,9 @@
                     android:orientation="horizontal"
                     android:paddingHorizontal="18dp"
                     android:paddingVertical="10dp"
-                    app:layout_constraintTop_toBottomOf="@id/divider3"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    app:layout_constraintTop_toBottomOf="@id/divider3">
 
                     <TextView
                         android:layout_width="0dp"
@@ -322,40 +323,10 @@
                     android:layout_width="0dp"
                     android:layout_height="1dp"
                     android:background="@color/divider_gray"
-                    app:layout_constraintTop_toBottomOf="@id/rowHighContrast"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
-
-                <!-- Reduce Motion -->
-                <LinearLayout
-                    android:id="@+id/rowReduceMotion"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="18dp"
-                    android:paddingVertical="10dp"
-                    app:layout_constraintTop_toBottomOf="@id/divider4"
-                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent">
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rowHighContrast" />
 
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Reduce Motion"
-                        android:textColor="@color/teal_primary"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-
-                    <Switch
-                        android:id="@+id/switchReduceMotion"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:checked="true"
-                        android:text="" />
-                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -8,7 +8,6 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +16,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class PreferencesPage : AppCompatActivity() {
+
     private lateinit var prefs: SharedPreferences
 
     // Keeping the option lists here means adding a new language/size later
@@ -25,29 +25,30 @@ class PreferencesPage : AppCompatActivity() {
     private val textSizes = arrayOf("Small", "Medium", "Large")
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 1. ALWAYS call super.onCreate() first
+        super.onCreate(savedInstanceState)
 
-        //checks the right color when changed making sure that applied changes made are applied
-
+        // 2. Setup preferences
         prefs = getSharedPreferences("metrogo_prefs", MODE_PRIVATE)
+
+        // 3. Apply the saved theme preference BEFORE setting the content view
+        val isDark = prefs.getBoolean("dark_theme", false)
         AppCompatDelegate.setDefaultNightMode(
-            if (prefs.getBoolean("dark_theme",false))
-                AppCompatDelegate.MODE_NIGHT_YES
-                else
-                    AppCompatDelegate.MODE_NIGHT_NO
+            if (isDark) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
         )
 
-        super.onCreate(savedInstanceState)
+        // 4. Set up the UI
         enableEdgeToEdge()
         setContentView(R.layout.activity_preferences_page)
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        prefs = getSharedPreferences("metrogo_prefs", MODE_PRIVATE)
-
-        // Top bar navigation (same pattern as the other screens)
+        // 5. Top bar navigation
         val circleSettings = findViewById<FrameLayout>(R.id.circleSettings)
         circleSettings.setOnClickListener {
             startActivity(Intent(this, SettingsPage::class.java))
@@ -63,12 +64,12 @@ class PreferencesPage : AppCompatActivity() {
             startActivity(Intent(this, NotificationPage::class.java))
         }
 
-        val btnback = findViewById<ImageButton>(R.id.btnBack)
-        btnback.setOnClickListener {
+        val btnBack = findViewById<ImageButton>(R.id.btnBack)
+        btnBack.setOnClickListener {
             finish()
         }
 
-        // We are going to need an API to make sure that the application can atleast translate into 2 South african languages
+        // Changing the Applicatoin Language via utilising an API
         val tvLanguageValue = findViewById<TextView>(R.id.tvLanguageValue)
         tvLanguageValue.text = prefs.getString("app_language", "English")
 
@@ -88,19 +89,22 @@ class PreferencesPage : AppCompatActivity() {
                 .show()
         }
 
-        // The App will be able to change its  Theme (Light / Dark)
+        // 7. App Theme (Light / Dark)
         val switchTheme = findViewById<Switch>(R.id.switchTheme)
-
         switchTheme.isChecked = prefs.getBoolean("dark_theme", false)
 
-
         switchTheme.setOnCheckedChangeListener { _, isChecked ->
+            // Save the preference FIRST
+            prefs.edit().putBoolean("dark_theme", isChecked).apply()
 
-            AppCompatDelegate.setDefaultNightMode(if (isChecked) AppCompatDelegate.MODE_NIGHT_YES
-                else AppCompatDelegate.MODE_NIGHT_NO)
+            // Then apply the theme change (this will recreate the Activity)
+            AppCompatDelegate.setDefaultNightMode(
+                if (isChecked) AppCompatDelegate.MODE_NIGHT_YES
+                else AppCompatDelegate.MODE_NIGHT_NO
+            )
         }
 
-        // The app will be able to changes its Text Size
+        // 8. Text Size
         val tvTextSizeValue = findViewById<TextView>(R.id.tvTextSizeValue)
         tvTextSizeValue.text = prefs.getString("text_size", "Medium")
 
@@ -120,7 +124,7 @@ class PreferencesPage : AppCompatActivity() {
                 .show()
         }
 
-        //  High Contrast Mode
+        // 9. High Contrast Mode
         val switchHighContrast = findViewById<Switch>(R.id.switchHighContrast)
         switchHighContrast.isChecked = prefs.getBoolean("high_contrast", false)
         switchHighContrast.setOnCheckedChangeListener { _, isChecked ->
@@ -128,12 +132,7 @@ class PreferencesPage : AppCompatActivity() {
             // TODO: apply a high-contrast color scheme once one is defined
         }
 
-        // Reduce Motion
-        val switchReduceMotion = findViewById<Switch>(R.id.switchReduceMotion)
-        switchReduceMotion.isChecked = prefs.getBoolean("reduce_motion", true)
-        switchReduceMotion.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("reduce_motion", isChecked).apply()
-            // TODO: disable/shorten transition animations app-wide when true
+
         }
-    }
+
 }
