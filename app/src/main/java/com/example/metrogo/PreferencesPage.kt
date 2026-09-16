@@ -38,7 +38,7 @@ class PreferencesPage : AppCompatActivity() {
             else AppCompatDelegate.MODE_NIGHT_NO
         )
 
-        // 4. Set up the UI
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_preferences_page)
 
@@ -48,7 +48,7 @@ class PreferencesPage : AppCompatActivity() {
             insets
         }
 
-        // 5. Top bar navigation
+        // Top bar navigation
         val circleSettings = findViewById<FrameLayout>(R.id.circleSettings)
         circleSettings.setOnClickListener {
             startActivity(Intent(this, SettingsPage::class.java))

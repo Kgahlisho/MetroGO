@@ -112,7 +112,12 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp">
+
+
+
+
 
             <TextView
                 android:id="@+id/tvTitle"
@@ -136,17 +141,11 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginEnd="20dp"
-                android:layout_marginBottom="24dp"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
-                android:paddingVertical="4dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
+                android:elevation="4dp"
                 app:layout_constraintTop_toBottomOf="@id/tvTitle"
-                app:layout_constraintVertical_bias="0.18">
-
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <LinearLayout
                     android:id="@+id/rowLanguage"
@@ -163,6 +162,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
+
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -171,6 +171,7 @@
                         android:textColor="@color/teal_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
+
 
                     <TextView
                         android:id="@+id/tvLanguageValue"
@@ -193,7 +194,7 @@
                     android:id="@+id/divider1"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:background="@color/divider_gray"
+                    android:background="#E0E0E0"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/rowLanguage" />
@@ -206,7 +207,7 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="18dp"
-                    android:paddingVertical="10dp"
+                    android:paddingVertical="12dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/divider1">
@@ -215,24 +216,31 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="App Theme (Light or Dark)"
+                        android:text="App Theme"
                         android:textColor="@color/teal_primary"
                         android:textSize="15sp"
                         android:textStyle="bold" />
+
+
+                    <ImageView
+                        android:id="@+id/ivThemeIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_sun" />
 
                     <Switch
                         android:id="@+id/switchTheme"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:text="" />
+                        android:checked="false" />
                 </LinearLayout>
 
                 <View
                     android:id="@+id/divider2"
                     android:layout_width="0dp"
                     android:layout_height="1dp"
-                    android:background="@color/divider_gray"
+                    android:background="#E0E0E0"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/rowTheme" />
@@ -252,6 +260,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/divider2">
+
 
                     <TextView
                         android:layout_width="0dp"
@@ -296,12 +305,13 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:paddingHorizontal="18dp"
-                    android:paddingVertical="10dp"
+                    android:paddingVertical="12dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/divider3">
 
-                    <TextView
+
+                <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -314,8 +324,7 @@
                         android:id="@+id/switchHighContrast"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="false"
-                        android:text="" />
+                        android:checked="false" />
                 </LinearLayout>
 
                 <View
@@ -329,6 +338,24 @@
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Button
+                android:id="@+id/btnLogOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/bg_btn_logout_red"
+                android:paddingHorizontal="32dp"
+                android:paddingVertical="12dp"
+                android:text="Log Out"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintTop_toBottomOf="@id/cardPreferences"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

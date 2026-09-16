@@ -20,7 +20,6 @@ class Dashboard : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-
         val circleSettings = findViewById<FrameLayout>(R.id.circleSettings)
         circleSettings.setOnClickListener {
             intent = Intent(this, SettingsPage::class.java)
@@ -32,7 +31,6 @@ class Dashboard : AppCompatActivity() {
             val intent = Intent(this, ProfileManagement::class.java)
             startActivity(intent)
         }
-
         val circleNotification = findViewById<FrameLayout>(R.id.circleNotification)
         circleNotification.setOnClickListener{
             val intent = Intent(this , NotificationPage::class.java)

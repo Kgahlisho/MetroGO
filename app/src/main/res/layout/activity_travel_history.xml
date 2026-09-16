@@ -116,23 +116,169 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp">
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginStart="138dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="138dp"
-        android:text="Travel history"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="@color/teal_primary"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+
+            <ImageView
+                android:id="@+id/ivHistoryIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="24dp"
+                android:src="@drawable/ic_history_clock"
+                app:tint="@color/teal_primary"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tvTitle"
+                app:layout_constraintHorizontal_chainStyle="packed"/>
+
+
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Travel History"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/teal_primary"
+                app:layout_constraintTop_toTopOf="@+id/ivHistoryIcon"
+                app:layout_constraintBottom_toBottomOf="@+id/ivHistoryIcon"
+                app:layout_constraintStart_toEndOf="@+id/ivHistoryIcon"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvXpLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="32dp"
+                android:text="XP"
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ivHistoryIcon" />
+
+
+
+            <ProgressBar
+                android:id="@+id/pbXp"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="24dp"
+                android:layout_marginHorizontal="8dp"
+                android:progress="0"
+                android:max="1000"
+                android:progressTint="#4CAF50"
+                android:progressBackgroundTint="#E0E0E0"
+                app:layout_constraintStart_toEndOf="@+id/tvXpLabel"
+                app:layout_constraintEnd_toStartOf="@+id/tvLevel"
+                app:layout_constraintTop_toTopOf="@+id/tvXpLabel"
+                app:layout_constraintBottom_toBottomOf="@+id/tvXpLabel"/>
+
+
+            <TextView
+                android:id="@+id/tvXpValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0/1000"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#2196F3"
+                app:layout_constraintStart_toStartOf="@+id/pbXp"
+                app:layout_constraintEnd_toEndOf="@+id/pbXp"
+                app:layout_constraintTop_toTopOf="@+id/pbXp"
+                app:layout_constraintBottom_toBottomOf="@+id/pbXp"/>
+
+            <TextView
+                android:id="@+id/tvLevel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="24dp"
+                android:text="Level 1"
+                android:textColor="#2196F3"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvXpLabel"
+                app:layout_constraintBottom_toBottomOf="@+id/tvXpLabel"/>
+
+            <LinearLayout
+                android:id="@+id/layoutFilter"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginHorizontal="24dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                app:layout_constraintTop_toBottomOf="@+id/pbXp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Filter by:"
+                android:textStyle="bold"
+                android:textColor="#2196F3"
+                android:textSize="14sp"/>
+
+                <Spinner
+                    android:id="@+id/spinnerFilter"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_input_gray"
+                    android:paddingHorizontal="8dp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutHeaders"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginHorizontal="24dp"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_input_gray"
+                android:padding="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/layoutFilter"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Trips :"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:gravity="center"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Status :"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:gravity="center" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTrips"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:nestedScrollingEnabled="false"
+                app:layout_constraintTop_toBottomOf="@+id/layoutHeaders"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:listitem="@layout/item_trip"/>
+
+
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
