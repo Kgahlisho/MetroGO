@@ -237,7 +237,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:hint="Select destination"
-                        android:text="Sandton Station"
+                        android:text="Soshanguve"
                         android:textColor="@color/white"
                         android:textSize="13sp"
                         android:textStyle="bold"/>
@@ -263,7 +263,7 @@
                 android:layout_marginTop="24dp"
                 android:background="#E0E0E0" />
 
-            <!-- Schedule Section -->
+            <!-- Matching Transport Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -279,204 +279,79 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvMatchingSubtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Select a route below"
+                    android:text="Buses for your selected trip"
                     android:textColor="#666666"
                     android:textSize="13sp" />
 
-
-                <LinearLayout
+                <TextView
+                    android:id="@+id/tvNoMatches"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_card_white"
                     android:elevation="2dp"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:text="No direct buses found for this route yet. Check the other available buses below, or try a different From/To."
+                    android:textColor="#666666"
+                    android:textSize="13sp"
+                    android:visibility="gone" />
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvMatchingBuses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_bus_route" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingVertical="8dp">
-
-                        <LinearLayout
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/bg_circle_teal"
-                            android:gravity="center">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🚌"
-                                android:textSize="18sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Route A - City Center"
-                                android:textColor="@color/teal_dark"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Departure: 08:30 | Arrival: 09:15"
-                                android:textColor="#666666"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_teal"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="R25"
-                            android:textColor="@color/white"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#E0E0E0" />
-
-                    <!-- 2 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingVertical="8dp">
-
-                        <LinearLayout
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/bg_circle_teal"
-                            android:gravity="center">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🚇"
-                                android:textSize="18sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Route B - Suburban"
-                                android:textColor="@color/teal_dark"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Departure: 09:00 | Arrival: 09:45"
-                                android:textColor="#666666"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_teal"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="R35"
-                            android:textColor="@color/white"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#E0E0E0" />
-
-                    <!-- Route 3 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        android:paddingVertical="8dp">
-
-                        <LinearLayout
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/bg_circle_teal"
-                            android:gravity="center">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="🚍"
-                                android:textSize="18sp" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Route C - Express"
-                                android:textColor="@color/teal_dark"
-                                android:textSize="14sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Departure: 10:00 | Arrival: 10:30"
-                                android:textColor="#666666"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_pill_teal"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="4dp"
-                            android:text="R45"
-                            android:textColor="@color/white"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="24dp"
+                android:background="#E0E0E0" />
+
+            <!-- Other Available Transport Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Other Available Transport"
+                    android:textColor="@color/teal_primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Not on your route, but running now"
+                    android:textColor="#666666"
+                    android:textSize="13sp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvOtherBuses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false"
+                    tools:listitem="@layout/item_bus_route" />
+
+            </LinearLayout>
+
 
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

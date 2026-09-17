@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -35,6 +36,8 @@ class PaymentActivity : AppCompatActivity() {
             insets
         }
 
+
+
         val extraRoute = intent.getSerializableExtra(EXTRA_BUS_ROUTE) as? BusRoute
         if (extraRoute == null) {
             Toast.makeText(this, "No bus selected.", Toast.LENGTH_SHORT).show()
@@ -43,7 +46,10 @@ class PaymentActivity : AppCompatActivity() {
         }
         busRoute = extraRoute
 
-        findViewById<FrameLayout>(R.id.btnBack).setOnClickListener { finish() }
+        findViewById<FrameLayout>(R.id.btnBack).setOnClickListener {
+            //Toast.makeText(this, "Back clicked", Toast.LENGTH_SHORT).show()
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         bindTripSummary()
         bindWalletBalance()

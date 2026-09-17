@@ -39,10 +39,13 @@
                 android:layout_height="34dp"
                 android:layout_gravity="center"
                 android:background="@drawable/bg_circle_outline_white"
+                android:clickable="false"
                 android:contentDescription="@null"
+                android:focusable="false"
                 android:importantForAccessibility="no"
                 android:padding="8dp"
                 android:src="@drawable/ic_arrow_back" />
+
         </FrameLayout>
 
         <TextView

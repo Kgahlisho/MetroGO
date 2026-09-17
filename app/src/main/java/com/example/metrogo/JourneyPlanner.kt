@@ -13,6 +13,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class JourneyPlanner : AppCompatActivity() {
 
@@ -23,6 +25,11 @@ class JourneyPlanner : AppCompatActivity() {
     private lateinit var btnSwap: ImageButton
     private lateinit var btnFindRoutes: Button
     private lateinit var btnBack: ImageButton
+
+    private lateinit var tvMatchingSubtitle: TextView
+    private lateinit var tvNoMatches: TextView
+    private lateinit var rvMatchingBuses: RecyclerView
+    private lateinit var rvOtherBuses: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,11 +60,13 @@ class JourneyPlanner : AppCompatActivity() {
             startActivity(intent)
         }
 
-        // Initialize views
         initViews()
-
-        // Set up click listeners
         setupClickListeners()
+        setupBusLists()
+
+        // Show results for the default From/To straight away, rather than waiting
+        // for the user to tap "Find Routes" first.
+        findRoutes()
     }
 
     private fun initViews() {
@@ -68,50 +77,48 @@ class JourneyPlanner : AppCompatActivity() {
         btnSwap = findViewById(R.id.btnSwap)
         btnFindRoutes = findViewById(R.id.btnFindRoutes)
         btnBack = findViewById(R.id.btnBack)
+
+        tvMatchingSubtitle = findViewById(R.id.tvMatchingSubtitle)
+        tvNoMatches = findViewById(R.id.tvNoMatches)
+        rvMatchingBuses = findViewById(R.id.rvMatchingBuses)
+        rvOtherBuses = findViewById(R.id.rvOtherBuses)
     }
 
     private fun setupClickListeners() {
-        // From location click - opens station selection
         inputFrom.setOnClickListener {
             showStationSelectionDialog("From")
         }
 
-        // To location click - opens station selection
         inputTo.setOnClickListener {
             showStationSelectionDialog("To")
         }
 
-        // Swap locations
         btnSwap.setOnClickListener {
             swapLocations()
         }
 
-        // Find routes
         btnFindRoutes.setOnClickListener {
             findRoutes()
         }
 
-        // Back button
-        val btnback = findViewById<ImageButton>(R.id.btnBack)
-        btnback.setOnClickListener {
+        btnBack.setOnClickListener {
             finish()
         }
     }
 
-    private fun showStationSelectionDialog(type: String) {
-        // Sample stations - before implementing an  API or database
-        val stations = arrayOf(
-            "Park Station",
-            "Sandton Station",
-            "Rosebank Station",
-            "Midrand Station",
-            "Centurion Station",
-            "Pretoria Station",
-            "Johannesburg Station",
-            "OR Tambo Station"
-        )
+    private fun setupBusLists() {
+        rvMatchingBuses.layoutManager = LinearLayoutManager(this)
+        rvOtherBuses.layoutManager = LinearLayoutManager(this)
+        // Both lists live inside the screen's outer NestedScrollView, so let it own scrolling.
+        rvMatchingBuses.isNestedScrollingEnabled = false
+        rvOtherBuses.isNestedScrollingEnabled = false
+    }
 
-        //  selection dialog
+    private fun showStationSelectionDialog(type: String) {
+        // Pulled from the same repository PurchaseTicket uses, so every station shown here
+        // is guaranteed to actually match a real route's origin/destination.
+        val stations = BusRouteRepository.stationNames.toTypedArray()
+
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Select $type Station")
             .setItems(stations) { _, which ->
@@ -121,6 +128,8 @@ class JourneyPlanner : AppCompatActivity() {
                 } else {
                     tvToStation.text = selectedStation
                 }
+                // Re-run the search immediately so results always reflect what's on screen.
+                findRoutes()
             }
             .setNegativeButton("Cancel", null)
             .show()
@@ -130,30 +139,40 @@ class JourneyPlanner : AppCompatActivity() {
         val fromText = tvFromStation.text.toString()
         val toText = tvToStation.text.toString()
 
-        // Swap the text
         tvFromStation.text = toText
         tvToStation.text = fromText
 
-        // Show toast message
         Toast.makeText(this, "Locations swapped", Toast.LENGTH_SHORT).show()
+        findRoutes()
     }
 
     private fun findRoutes() {
         val from = tvFromStation.text.toString()
         val to = tvToStation.text.toString()
 
-        // Validate that locations are different
         if (from == to) {
             Toast.makeText(this, "Please select different locations", Toast.LENGTH_SHORT).show()
             return
         }
 
-        // Show progress or search for routes
-        Toast.makeText(this, "Searching routes from $from to $to...", Toast.LENGTH_SHORT).show()
+        val matchingRoutes = BusRouteRepository.routesBetween(from, to)
+        val otherRoutes = BusRouteRepository.routesExcluding(from, to)
 
-        // In a real app, you would:
-        // 1. Call API to get available routes
-        // 2. Display results in a list or on map
-        // 3. Show bus schedule
+        tvMatchingSubtitle.text = "$from \u2192 $to"
+        tvNoMatches.visibility = if (matchingRoutes.isEmpty()) View.VISIBLE else View.GONE
+        rvMatchingBuses.visibility = if (matchingRoutes.isEmpty()) View.GONE else View.VISIBLE
+
+        rvMatchingBuses.adapter = Busrouteadapter(matchingRoutes) { selectedRoute ->
+            openPayment(selectedRoute)
+        }
+        rvOtherBuses.adapter = Busrouteadapter(otherRoutes) { selectedRoute ->
+            openPayment(selectedRoute)
+        }
+    }
+
+    private fun openPayment(route: BusRoute) {
+        val intent = Intent(this, PaymentActivity::class.java)
+        intent.putExtra(PaymentActivity.EXTRA_BUS_ROUTE, route)
+        startActivity(intent)
     }
 }
