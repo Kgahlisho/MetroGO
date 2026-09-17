@@ -2,13 +2,14 @@ package com.example.metrogo
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import android.widget.LinearLayout
 
 class Dashboard : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,5 +63,38 @@ class Dashboard : AppCompatActivity() {
             val intent = Intent(this , JourneyPlanner::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh every time the dashboard becomes visible, so a ticket bought on
+        // PurchaseTicket/PaymentActivity -- or a top-up made on Wallet -- shows up immediately.
+        refreshWalletBalance()
+        refreshBoardingPass()
+    }
+
+    private fun refreshWalletBalance() {
+        val balance = TicketManager.getBalance(this)
+        findViewById<TextView>(R.id.tvBalance).text = "R $balance"
+    }
+
+    private fun refreshBoardingPass() {
+        val qrImageView = findViewById<ImageView>(R.id.BoardingCode)
+        val statusText = findViewById<TextView>(R.id.tvBoardingStatus)
+
+        val ticket = TicketManager.getActiveTicket(this)
+        if (ticket == null) {
+            qrImageView.setImageDrawable(null)
+            statusText.text = "No active boarding pass\nPurchase a ticket to get one"
+            return
+        }
+
+        val qrBitmap = TicketManager.generateQrBitmap(ticket.toQrPayload())
+        qrImageView.setImageBitmap(qrBitmap)
+
+        statusText.textSize = 12f
+        statusText.text = "Active: ${ticket.transportName}\n" +
+                "${ticket.origin} \u2192 ${ticket.destination}\n" +
+                "Departs ${ticket.departureTime} \u2022 Bus ${ticket.registration}"
     }
 }

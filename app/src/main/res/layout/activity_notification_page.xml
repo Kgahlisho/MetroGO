@@ -18,12 +18,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="11dp"
             android:layout_marginBottom="11dp"
             android:text="MetroGO"
@@ -44,7 +43,6 @@
             app:layout_constraintBottom_toBottomOf="parent">
 
             <TextView
-
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -72,6 +70,7 @@
         </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/circleNotification"
             android:layout_width="34dp"
             android:layout_height="34dp"
             android:background="@drawable/bg_circle_lime"
@@ -86,14 +85,12 @@
                 android:layout_gravity="center"
                 android:src="@drawable/ic_notification_bell"
                 app:tint="@color/white" />
-
         </FrameLayout>
+
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="34dp"
             android:layout_height="34dp"
-            android:layout_marginTop="11dp"
-            android:layout_marginBottom="11dp"
             android:background="@drawable/bg_circle_outline_white"
             android:contentDescription="Back"
             android:padding="8dp"
@@ -102,8 +99,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollContent"
@@ -123,19 +120,19 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="46dp"
+                android:layout_marginEnd="60dp"
                 android:text="Notifications"
-                android:textColor="@color/teal_primary"
                 android:textSize="22sp"
                 android:textStyle="bold"
+                android:textColor="@color/teal_primary"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
 
 
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
