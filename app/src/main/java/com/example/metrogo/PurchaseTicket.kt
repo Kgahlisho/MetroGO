@@ -47,15 +47,22 @@ class PurchaseTicket : AppCompatActivity() {
     private fun setupBusList() {
         // TODO: replace with real bus/route data (API or local schedule DB) once available.
         val availableBuses = listOf(
-            BusRoute(1, "T4 Vea Raya", "Rosebank", "Parktown", "14:33", "15:10", 21, "GP 123-456"),
-            BusRoute(2, "T3 Vea Raya", "Sandton", "Rosebank", "14:58", "15:20", 25, "GP 234-567"),
-            BusRoute(3, "T7 Vea Raya", "Parktown", "Sandton", "15:13", "15:50", 25, "GP 345-678"),
-            BusRoute(4, "T5 Vea Raya", "Rosebank", "Midrand", "16:33", "17:15", 30, "GP 456-789"),
-            BusRoute(5, "T2 Vea Raya", "Sandton", "Parktown", "16:58", "17:30", 21, "GP 567-890"),
-            BusRoute(6, "T9 Vea Raya", "Park Station", "Midrand", "16:58", "17:40", 28, "GP 678-901")
+            BusRoute(1, "T9 Vea Raya", "Park Station", "Soshanguve", "08:15", "08:57", 32, "GP 814-263", 42),
+            BusRoute(2, "Vea Raya", "Rosebank", "Midrand", "09:42", "10:24", 27, "GP 392-715", 42),
+            BusRoute(3, "T2 Vea Raya", "Soweto", "Parktown", "10:18", "10:51", 24, "GP 641-908", 33),
+            BusRoute(4, "T7 Vea Raya", "Centurion", "Sandton", "11:35", "12:48", 29, "GP 527-384", 73),
+            BusRoute(5, "T3 Vea Raya", "Sandton", "Rosebank", "12:10", "12:37", 22, "GP 176-529", 27),
+            BusRoute(6, "Vea Raya", "Rosebank", "Parktown", "13:27", "14:08", 26, "GP 903-417", 41),
+            BusRoute(7, "T9 Vea Raya", "Park Station", "Soshanguve", "14:52", "15:36", 31, "GP 458-672", 44),
+            BusRoute(8, "T2 Vea Raya", "Soweto", "Parktown", "15:41", "16:16", 23, "GP 735-194", 35),
+            BusRoute(9, "T7 Vea Raya", "Centurion", "Sandton", "16:25", "17:39", 28, "GP 286-843", 74),
+            BusRoute(10, "T3 Vea Raya", "Sandton", "Rosebank", "17:08", "17:34", 25, "GP 619-357", 26),
+            BusRoute(11, "Vea Raya", "Rosebank", "Midrand", "18:14", "18:58", 30, "GP 842-516", 44),
+            BusRoute(12, "T2 Vea Raya", "Soweto", "Parktown", "19:36", "20:09", 21, "GP 374-825", 33)
+
         )
 
-        val rvBuses = findViewById<RecyclerView>(R.id.rvBuses)
+            val rvBuses = findViewById<RecyclerView>(R.id.rvBuses)
         rvBuses.layoutManager = LinearLayoutManager(this)
         rvBuses.adapter = Busrouteadapter(availableBuses) { selectedRoute ->
             val intent = Intent(this, PaymentActivity::class.java)

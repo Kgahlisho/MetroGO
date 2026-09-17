@@ -11,6 +11,7 @@ data class BusRoute (
     val departureTime: String,
     val arrivalTime : String,
     val price : Int,
-    val registration : String
+    val registration : String,
+    val durationMinutes: Int = 0
 
 ):Serializable
