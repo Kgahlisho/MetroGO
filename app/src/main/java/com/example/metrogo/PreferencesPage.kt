@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
@@ -91,11 +92,15 @@ class PreferencesPage : AppCompatActivity() {
 
         // 7. App Theme (Light / Dark)
         val switchTheme = findViewById<Switch>(R.id.switchTheme)
-        switchTheme.isChecked = prefs.getBoolean("dark_theme", false)
+        val ivThemeIcon = findViewById<ImageView>(R.id.ivThemeIcon)
+        switchTheme.isChecked = isDark
+        ivThemeIcon.setImageResource(if (isDark) R.drawable.ic_moon else R.drawable.ic_sun)
 
         switchTheme.setOnCheckedChangeListener { _, isChecked ->
             // Save the preference FIRST
             prefs.edit().putBoolean("dark_theme", isChecked).apply()
+
+            ivThemeIcon.setImageResource(if (isChecked) R.drawable.ic_moon else R.drawable.ic_sun)
 
             // Then apply the theme change (this will recreate the Activity)
             AppCompatDelegate.setDefaultNightMode(
@@ -133,6 +138,6 @@ class PreferencesPage : AppCompatActivity() {
         }
 
 
-        }
+    }
 
 }

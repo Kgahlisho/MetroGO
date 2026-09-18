@@ -3,22 +3,24 @@ package com.example.metrogo
 import org.json.JSONObject
 import java.io.Serializable
 
-data class Ticket (
+/**
+ * A purchased ticket. This is what gets encoded into the QR code shown on the Dashboard,
+ * and persisted so it survives app restarts until it's used/expired.
+ */
+data class Ticket(
     val ticketId: String,
-    val passengerName : String,
+    val passengerName: String,
     val transportName: String,
     val origin: String,
-    val destination : String,
+    val destination: String,
     val departureTime: String,
     val arrivalTime: String,
-    val registration : String,
+    val registration: String,
     val price: Int,
     val purchaseTimestamp: Long
+) : Serializable {
 
-
-) : Serializable
-
-{
+    /** The exact string that gets encoded into the QR code. Keep this compact. */
     fun toQrPayload(): String {
         val json = JSONObject()
         json.put("ticketId", ticketId)

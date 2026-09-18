@@ -162,10 +162,10 @@ class JourneyPlanner : AppCompatActivity() {
         tvNoMatches.visibility = if (matchingRoutes.isEmpty()) View.VISIBLE else View.GONE
         rvMatchingBuses.visibility = if (matchingRoutes.isEmpty()) View.GONE else View.VISIBLE
 
-        rvMatchingBuses.adapter = Busrouteadapter(matchingRoutes) { selectedRoute ->
+        rvMatchingBuses.adapter = BusRouteAdapter(matchingRoutes) { selectedRoute ->
             openPayment(selectedRoute)
         }
-        rvOtherBuses.adapter = Busrouteadapter(otherRoutes) { selectedRoute ->
+        rvOtherBuses.adapter = BusRouteAdapter(otherRoutes) { selectedRoute ->
             openPayment(selectedRoute)
         }
     }

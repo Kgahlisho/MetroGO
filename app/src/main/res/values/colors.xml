@@ -12,4 +12,5 @@
     <color name="input_gray">#EDEDED</color>
     <color name="divider_gray">#E2E2E2</color>
     <color name="text_gray">#555555</color>
+    <color name="app_background">#F5F7FA</color>
 </resources>

@@ -5,28 +5,40 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     tools:context=".PurchaseTicket">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
         android:layout_height="56dp"
-        android:background="@color/teal_primary"
+        android:background="@color/white"
         android:paddingHorizontal="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_list_item_grey"
+            android:contentDescription="Back"
+            android:padding="8dp"
+            android:src="@drawable/ic_arrow_back"
+            app:tint="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/tvAppName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="11dp"
-            android:layout_marginBottom="11dp"
-            android:text="MetroGO"
-            android:textColor="@color/white"
-            android:textSize="20sp"
+            android:layout_marginStart="14dp"
+            android:text="Purchase Ticket"
+            android:textColor="@color/black"
+            android:textSize="17sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/btnBack"
@@ -36,69 +48,64 @@
             android:id="@+id/circleProfile"
             android:layout_width="34dp"
             android:layout_height="34dp"
-            android:background="@drawable/bg_circle_outline_white"
+            android:background="@drawable/bg_list_item_grey"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_gravity="center"
-                android:text="&#128100;"
-                android:textSize="16sp"/>
+                android:src="@drawable/ic_person"
+                app:tint="@color/black" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/circleSettings"
             android:layout_width="34dp"
             android:layout_height="34dp"
-            android:background="@drawable/bg_circle_lime"
+            android:background="@drawable/bg_list_item_grey"
             app:layout_constraintEnd_toStartOf="@id/circleProfile"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginEnd="10dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_gravity="center"
-                android:text="&#9881;"
-                android:textSize="25sp"
-                android:textColor="@color/white" />
+                android:src="@drawable/ic_settings"
+                app:tint="@color/black" />
         </FrameLayout>
 
         <FrameLayout
             android:id="@+id/circleNotification"
             android:layout_width="34dp"
             android:layout_height="34dp"
-            android:background="@drawable/bg_circle_lime"
+            android:background="@drawable/bg_list_item_grey"
             app:layout_constraintEnd_toStartOf="@id/circleSettings"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginEnd="10dp">
 
             <ImageView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_notification_bell"
-                app:tint="@color/white" />
+                app:tint="@color/black" />
         </FrameLayout>
 
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:background="@drawable/bg_circle_outline_white"
-            android:contentDescription="Back"
-            android:padding="8dp"
-            android:src="@drawable/ic_arrow_back"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/divider_gray"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollContent"
@@ -114,35 +121,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="24dp">
+            android:padding="16dp">
 
             <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:gravity="center"
-                android:text="Purchase Ticket"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="@color/teal_primary" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:gravity="center"
                 android:text="Choose an available bus"
-                android:textSize="13sp"
-                android:textColor="@color/text_gray" />
+                android:textColor="@color/text_gray"
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvNoBuses"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_card_white"
                 android:gravity="center"
+                android:padding="24dp"
                 android:text="No buses available on this route right now."
                 android:textColor="@color/text_gray"
                 android:textSize="13sp"
@@ -152,7 +148,7 @@
                 android:id="@+id/rvBuses"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="10dp"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_bus_route" />
 

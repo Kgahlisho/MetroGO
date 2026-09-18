@@ -13,4 +13,5 @@
     <color name="input_gray">#2C2C2C</color> <!-- Dark gray for inputs -->
     <color name="divider_gray">#444444</color> <!-- Darker divider -->
     <color name="text_gray">#AAAAAA</color> <!-- Lighter gray text -->
+    <color name="app_background">#121212</color> <!-- Dark page background - was missing, kept the whole app on the light page color -->
 </resources>

@@ -5,12 +5,23 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Restore the saved theme preference before showing any UI, so the app
+        // doesn't briefly flash light mode before the user reaches Preferences.
+        val prefs = getSharedPreferences("metrogo_prefs", MODE_PRIVATE)
+        val isDark = prefs.getBoolean("dark_theme", false)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDark) AppCompatDelegate.MODE_NIGHT_YES
+            else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -27,8 +38,8 @@ class MainActivity : AppCompatActivity() {
         }
         val SignUpButton = findViewById<Button>(R.id.SignUpbutton)
         SignUpButton.setOnClickListener {
-                val intent = Intent(this, RegisterPage::class.java)
-                startActivity(intent)
-            }
+            val intent = Intent(this, RegisterPage::class.java)
+            startActivity(intent)
         }
     }
+}

@@ -150,6 +150,3 @@ class TravelHistory : AppCompatActivity() {
         adapter.updateList(filteredList)
     }
 }
-
-
-

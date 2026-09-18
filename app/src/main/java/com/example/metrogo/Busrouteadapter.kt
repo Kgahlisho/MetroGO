@@ -5,12 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-class Busrouteadapter(
 
+class BusRouteAdapter(
     private val routes: List<BusRoute>,
     private val onSelect: (BusRoute) -> Unit
-
-): RecyclerView.Adapter<Busrouteadapter.BusRouteViewHolder>() {
+) : RecyclerView.Adapter<BusRouteAdapter.BusRouteViewHolder>() {
 
     class BusRouteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvTransportName: TextView = itemView.findViewById(R.id.tvTransportName)

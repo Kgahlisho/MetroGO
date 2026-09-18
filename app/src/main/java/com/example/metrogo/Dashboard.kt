@@ -10,8 +10,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import java.text.DecimalFormat
 
 class Dashboard : AppCompatActivity() {
+
+    private val currencyFormat = DecimalFormat("#,##0.00")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -75,7 +78,7 @@ class Dashboard : AppCompatActivity() {
 
     private fun refreshWalletBalance() {
         val balance = TicketManager.getBalance(this)
-        findViewById<TextView>(R.id.tvBalance).text = "R $balance"
+        findViewById<TextView>(R.id.tvBalance).text = "R${currencyFormat.format(balance)}"
     }
 
     private fun refreshBoardingPass() {

@@ -45,14 +45,11 @@ class PurchaseTicket : AppCompatActivity() {
     }
 
     private fun setupBusList() {
-        // TODO: replace with real bus/route data (API or local schedule DB) once available.
         val availableBuses = BusRouteRepository.sampleRoutes
-
-
 
         val rvBuses = findViewById<RecyclerView>(R.id.rvBuses)
         rvBuses.layoutManager = LinearLayoutManager(this)
-        rvBuses.adapter = Busrouteadapter(availableBuses) { selectedRoute ->
+        rvBuses.adapter = BusRouteAdapter(availableBuses) { selectedRoute ->
             val intent = Intent(this, PaymentActivity::class.java)
             intent.putExtra(PaymentActivity.EXTRA_BUS_ROUTE, selectedRoute)
             startActivity(intent)

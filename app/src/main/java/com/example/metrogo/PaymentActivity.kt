@@ -46,7 +46,7 @@ class PaymentActivity : AppCompatActivity() {
         }
         busRoute = extraRoute
 
-        findViewById<FrameLayout>(R.id.btnBack).setOnClickListener {
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             //Toast.makeText(this, "Back clicked", Toast.LENGTH_SHORT).show()
             onBackPressedDispatcher.onBackPressed()
         }
@@ -63,7 +63,7 @@ class PaymentActivity : AppCompatActivity() {
         }
     }
 
-        override fun onResume() {
+    override fun onResume() {
         super.onResume()
         bindWalletBalance()
     }

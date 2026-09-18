@@ -7,6 +7,16 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import java.util.UUID
 
+/**
+ * Simple SharedPreferences-backed store for:
+ *  - the passenger's wallet balance (deducted when a ticket is purchased)
+ *  - the currently active ticket (shown as a QR code on the Dashboard)
+ *
+ * This is intentionally lightweight (no database) since MetroGO only ever needs
+ * to track a single active ticket at a time. Swap for Room if you later want
+ * a full purchase history stored locally instead of relying on the dummy
+ * TravelHistory data.
+ */
 object TicketManager {
 
     private const val PREFS_NAME = "metrogo_prefs"
@@ -16,6 +26,8 @@ object TicketManager {
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    // ---------------- Wallet balance ----------------
 
     fun getBalance(context: Context): Int =
         prefs(context).getInt(KEY_WALLET_BALANCE, DEFAULT_BALANCE)
@@ -32,6 +44,8 @@ object TicketManager {
         val current = getBalance(context)
         prefs(context).edit().putInt(KEY_WALLET_BALANCE, current + amount).apply()
     }
+
+    // ---------------- Active ticket ----------------
 
     fun saveActiveTicket(context: Context, ticket: Ticket) {
         prefs(context).edit().putString(KEY_ACTIVE_TICKET, ticket.toJson()).apply()
@@ -52,6 +66,9 @@ object TicketManager {
 
     fun newTicketId(): String = "MG-" + UUID.randomUUID().toString().take(8).uppercase()
 
+    // ---------------- QR generation ----------------
+
+    /** Renders [content] as a black-on-white QR code bitmap, [sizePx] square. */
     fun generateQrBitmap(content: String, sizePx: Int = 512): Bitmap? {
         return try {
             val writer = QRCodeWriter()
@@ -68,5 +85,3 @@ object TicketManager {
         }
     }
 }
-
-
