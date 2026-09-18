@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     tools:context=".MainActivity">
 
     <androidx.core.widget.NestedScrollView
@@ -21,27 +22,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
-                android:text="Landing Page"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <androidx.cardview.widget.CardView
                 android:id="@+id/imageCard"
-                android:layout_width="216dp"
-                android:layout_height="216dp"
-                android:layout_marginTop="22dp"
-                app:cardCornerRadius="108dp"
-                app:cardElevation="0dp"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:layout_marginTop="64dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="70dp"
+                app:cardElevation="2dp"
                 app:cardPreventCornerOverlap="false"
-                app:layout_constraintTop_toBottomOf="@+id/textView"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
@@ -49,6 +39,7 @@
                     android:id="@+id/imageView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:padding="16dp"
                     android:scaleType="centerCrop"
                     android:contentDescription="MetroGO Logo"
                     app:srcCompat="@drawable/metro" />
@@ -56,36 +47,104 @@
             </androidx.cardview.widget.CardView>
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="90dp"
-                android:text="Welcome to metroGO"
-                android:textSize="20sp"
+                android:layout_marginTop="20dp"
+                android:text="MetroGO"
+                android:textColor="@color/teal_dark"
+                android:textSize="24sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/imageCard" />
 
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="48dp"
+                android:gravity="center"
+                android:text="Buses and tickets in one place."
+                android:textColor="@color/text_gray"
+                android:textSize="14sp"
+                android:lineSpacingExtra="3dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/welcomeCard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="36dp"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/bg_card_dark"
+                android:padding="20dp"
+                app:layout_constraintTop_toBottomOf="@id/textView2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
+                <TextView
+                    android:id="@+id/tvWelcomeHeadline"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="Your next ride, sorted."
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvWelcomeSub"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:alpha="0.7"
+                    android:text="Plan journeys, buy tickets and top up your wallet from one account."
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvWelcomeHeadline" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <Button
                 android:id="@+id/SignUpbutton"
                 android:layout_width="120dp"
-                android:layout_height="40dp"
+                android:layout_height="44dp"
                 android:layout_marginStart="51dp"
-                android:layout_marginTop="75dp"
+                android:layout_marginTop="28dp"
                 android:layout_marginBottom="48dp"
+                android:background="@drawable/bg_button_outline_teal"
                 android:text="SIGN UP"
+                android:textAllCaps="false"
+                android:textColor="@color/teal_dark"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/LoginButton"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView2" />
+                app:layout_constraintTop_toBottomOf="@+id/welcomeCard" />
 
             <Button
                 android:id="@+id/LoginButton"
                 android:layout_width="120dp"
-                android:layout_height="40dp"
+                android:layout_height="44dp"
                 android:layout_marginEnd="52dp"
+                android:background="@drawable/bg_button_teal"
                 android:text="LOGIN"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/SignUpbutton"
                 app:layout_constraintTop_toTopOf="@+id/SignUpbutton" />
