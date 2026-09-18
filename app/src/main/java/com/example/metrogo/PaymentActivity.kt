@@ -1,5 +1,6 @@
 package com.example.metrogo
 
+
 import android.content.Intent
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -19,11 +20,13 @@ import java.util.Locale
 
 class PaymentActivity : AppCompatActivity() {
 
+
     private lateinit var busRoute: BusRoute
     private var fareHoldTimer : CountDownTimer? = null
 
     private val currencyFormat = DecimalFormat("#,##0.00")
     private fun rand(amount: Number): String = "R${currencyFormat.format(amount)}"
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +39,6 @@ class PaymentActivity : AppCompatActivity() {
             insets
         }
 
-
-
         val extraRoute = intent.getSerializableExtra(EXTRA_BUS_ROUTE) as? BusRoute
         if (extraRoute == null) {
             Toast.makeText(this, "No bus selected.", Toast.LENGTH_SHORT).show()
@@ -45,6 +46,13 @@ class PaymentActivity : AppCompatActivity() {
             return
         }
         busRoute = extraRoute
+
+
+
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
+            //Toast.makeText(this, "Back clicked", Toast.LENGTH_SHORT).show()
+            onBackPressedDispatcher.onBackPressed()
+        }
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             //Toast.makeText(this, "Back clicked", Toast.LENGTH_SHORT).show()
@@ -62,6 +70,7 @@ class PaymentActivity : AppCompatActivity() {
             startActivity(Intent(this, Wallet::class.java))
         }
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -84,6 +93,7 @@ class PaymentActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvTotalAmount).text = rand(busRoute.price)
         findViewById<TextView>(R.id.tvTotalInline).text = rand(busRoute.price)
     }
+
 
     private fun bindWalletBalance() {
         val balance = TicketManager.getBalance(this)
@@ -117,7 +127,6 @@ class PaymentActivity : AppCompatActivity() {
         }.start()
     }
 
-
     private fun attemptPayment() {
         val insufficientFundsRow = findViewById<LinearLayout>(R.id.tvInsufficientFunds)
 
@@ -144,9 +153,17 @@ class PaymentActivity : AppCompatActivity() {
             price = busRoute.price,
             purchaseTimestamp = System.currentTimeMillis()
         )
+        val levelBefore = TicketManager.getXpProgress(this).level
         TicketManager.saveActiveTicket(this, ticket)
+        val xpEarned = TicketManager.addToHistory(this, ticket)
+        val levelAfter = TicketManager.getXpProgress(this).level
 
-        Toast.makeText(this, "Ticket purchased! Your QR code is on the Dashboard.", Toast.LENGTH_LONG).show()
+        val message = buildString {
+            append("Ticket purchased! Your QR code is on the Dashboard.")
+            if (xpEarned > 0) append(" +$xpEarned XP")
+            if (levelAfter > levelBefore) append("\nLevel up! You are now Level $levelAfter")
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         val intent = Intent(this, Dashboard::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)
@@ -157,3 +174,5 @@ class PaymentActivity : AppCompatActivity() {
         const val EXTRA_BUS_ROUTE = "extra_bus_route"
     }
 }
+
+

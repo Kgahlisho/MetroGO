@@ -160,7 +160,7 @@
                     android:layout_height="10dp"
                     android:layout_marginTop="10dp"
                     android:progress="0"
-                    android:max="1000"
+                    android:max="100"
                     android:progressTint="@color/teal_primary"
                     android:progressBackgroundTint="@color/divider_gray"
                     app:layout_constraintStart_toStartOf="parent"
@@ -172,7 +172,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:text="0/1000"
+                    android:text="0/100"
                     android:textSize="11sp"
                     android:textColor="@color/text_gray"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -223,6 +223,17 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 tools:listitem="@layout/item_trip"/>
+
+            <TextView
+                android:id="@+id/tvNoTrips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="No trips yet.\nTickets you buy will appear here."
+                android:textColor="@color/text_gray"
+                android:textSize="12sp"
+                android:visibility="gone" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

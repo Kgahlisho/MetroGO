@@ -8,7 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class TripAdapter(private var tripList: List<Trip>) : RecyclerView.Adapter<TripAdapter.TripViewHolder>() {
+class TripAdapter(
+    private var tripList: List<Trip>,
+    private val onTripClick: (Trip) -> Unit = {}
+) : RecyclerView.Adapter<TripAdapter.TripViewHolder>() {
 
     class TripViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val ivStatus: ImageView = itemView.findViewById(R.id.ivStatus)
@@ -19,6 +22,7 @@ class TripAdapter(private var tripList: List<Trip>) : RecyclerView.Adapter<TripA
         val tvPayment: TextView = itemView.findViewById(R.id.tvPaymentMethod)
         val tvXp: TextView = itemView.findViewById(R.id.tvXpEarned)
     }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TripViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_trip, parent, false)
@@ -34,6 +38,7 @@ class TripAdapter(private var tripList: List<Trip>) : RecyclerView.Adapter<TripA
         holder.tvCost.text = "Cost: ${trip.cost}"
         holder.tvPayment.text = "Paid via: ${trip.paymentMethod}"
         holder.tvXp.text = "XP Earned: ${trip.xpEarned}xp"
+        holder.itemView.setOnClickListener { onTripClick(trip) }
 
         if (trip.isPaid) {
             holder.ivStatus.setImageResource(R.drawable.ic_check_circle_green) // Ensure you have this drawable

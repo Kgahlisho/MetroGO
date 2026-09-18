@@ -1,12 +1,22 @@
 package com.example.metrogo
 
+import android.app.Dialog
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Spinner
 import android.widget.TextView
@@ -17,11 +27,14 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+
 class TravelHistory : AppCompatActivity() {
 
 
     private lateinit var adapter: TripAdapter
-    private lateinit var allTrips: List<Trip>
+    private var allTrips: List<Trip> = emptyList()
+    private var currentFilter = "All Trips"
+    private lateinit var tvEmpty: TextView
     private lateinit var pbXp: ProgressBar
     private lateinit var tvXpValue: TextView
     private lateinit var tvLevel: TextView
@@ -37,10 +50,11 @@ class TravelHistory : AppCompatActivity() {
             insets
         }
 
-
         pbXp = findViewById(R.id.pbXp)
         tvXpValue = findViewById(R.id.tvXpValue)
         tvLevel = findViewById(R.id.tvLevel)
+        tvEmpty = findViewById(R.id.tvNoTrips)
+
 
         findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
         findViewById<FrameLayout>(R.id.circleSettings).setOnClickListener {
@@ -53,67 +67,80 @@ class TravelHistory : AppCompatActivity() {
             startActivity(Intent(this, ProfileManagement::class.java))
         }
 
-        generateDummyData()
-
-        // 2. Calculate and Update XP Bar
-        calculateXp()
-
-        // 3. Setup RecyclerView
         val rvTrips = findViewById<RecyclerView>(R.id.rvTrips)
         rvTrips.layoutManager = LinearLayoutManager(this)
-        adapter = TripAdapter(allTrips)
+        adapter = TripAdapter(emptyList()) { trip -> showTripDetailsDialog(trip) }
         rvTrips.adapter = adapter
 
-        // 4. Setup Filter Spinner
         setupFilter()
+        loadTrips()
     }
 
-    private fun generateDummyData() {
-        allTrips = listOf(
-            Trip(1, "Rosebank to Parktown", "06:20", "10/08/26", "R21", "Phone", 10, true),
-            Trip(
-                2,
-                "Rosebank to Parktown",
-                "Missed",
-                "10/08/26",
-                "R21",
-                "Phone",
-                10,
-                false
-            ), // Not paid
-            Trip(3, "Sandton to Rosebank", "07:15", "11/08/26", "R25", "Card", 15, true),
-            Trip(4, "Parktown to Sandton", "17:30", "11/08/26", "R25", "Card", 15, true),
-            Trip(
-                5,
-                "Rosebank to Parktown",
-                "Missed",
-                "12/08/26",
-                "R21",
-                "Phone",
-                0,
-                false
-            ), // Not paid
-            Trip(6, "Sandton to Parktown", "08:00", "13/08/26", "R30", "Phone", 20, true)
-        )
+    override fun onResume() {
+        super.onResume()
+        // Re-read the store so a ticket bought a moment ago shows up immediately.
+        if (::adapter.isInitialized) loadTrips()
     }
 
-    private fun calculateXp() {
-        // Sum up all XP earned from all trips (or just paid trips, depending on logic)
-        val totalXp = allTrips.sumOf { it.xpEarned }
-        val maxXp = 1000
+    /** Loads the real tickets the user has bought, then refreshes XP + the list. */
+    private fun loadTrips() {
+        allTrips = TicketManager.getTripHistory(this)
+        updateXpBar()
+        filterTrips(currentFilter)
+    }
 
-        // Update Progress Bar
+    private fun updateXpBar() {
+        val progress = TicketManager.getXpProgress(this)
+        val maxXp = TicketManager.XP_PER_LEVEL
+
         pbXp.max = maxXp
-        pbXp.progress = totalXp
-
-        // Update Text
-        tvXpValue.text = "$totalXp/$maxXp"
-
-        // Calculate Level (Simple logic: every 100 XP = 1 Level)
-        val level = (totalXp / 100) + 1
-        tvLevel.text = "Level $level"
+        pbXp.progress = progress.xpInLevel
+        tvXpValue.text = "${progress.xpInLevel}/$maxXp"
+        tvLevel.text = "Level ${progress.level}"
     }
 
+    private fun showTripDetailsDialog(trip: Trip) {
+        val dialog = Dialog(this)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.dialog_trip_details)
+
+        dialog.findViewById<ImageView>(R.id.btnCloseTripDialog).setOnClickListener { dialog.dismiss() }
+
+        val t = trip.ticket
+        val rows = listOf(
+            "Ticket ID" to t.ticketId,
+            "Passenger" to t.passengerName,
+            "Transport" to t.transportName,
+            "Bus registration" to t.registration,
+            "From" to t.origin,
+            "To" to t.destination,
+            "Departs" to t.departureTime,
+            "Arrives" to t.arrivalTime,
+            "Purchased" to formatDateTime(t.purchaseTimestamp),
+            "Fare" to trip.cost,
+            "Paid via" to trip.paymentMethod,
+            "Status" to if (trip.isPaid) "Paid" else "Not paid",
+            "XP earned" to "${trip.xpEarned} XP"
+        )
+
+        val container = dialog.findViewById<LinearLayout>(R.id.layoutTripDetailRows)
+        val inflater = LayoutInflater.from(this)
+        for ((label, value) in rows) {
+            val row = inflater.inflate(R.layout.item_trip_detail_row, container, false)
+            row.findViewById<TextView>(R.id.tvDetailLabel).text = label
+            row.findViewById<TextView>(R.id.tvDetailValue).text = value
+            container.addView(row)
+        }
+
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.show()
+    }
+
+    private fun formatDateTime(timestamp: Long): String =
+        SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date(timestamp))
 
     private fun setupFilter() {
         val spinnerFilter = findViewById<Spinner>(R.id.spinnerFilter)
@@ -132,8 +159,7 @@ class TravelHistory : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                val selectedFilter = filterOptions[position]
-                filterTrips(selectedFilter)
+                filterTrips(filterOptions[position])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -141,12 +167,15 @@ class TravelHistory : AppCompatActivity() {
     }
 
     private fun filterTrips(filter: String) {
+        currentFilter = filter
         val filteredList = when (filter) {
             "Paid" -> allTrips.filter { it.isPaid }
             "Not Paid" -> allTrips.filter { !it.isPaid }
-            "Missed Boarding" -> allTrips.filter { it.boardingTime == "Missed" }
+            "Missed Boarding" -> emptyList() // not tracked for real tickets yet
             else -> allTrips // "All Trips"
         }
         adapter.updateList(filteredList)
+        tvEmpty.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
 }
+
