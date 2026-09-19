@@ -136,6 +136,7 @@ class TravelHistory : AppCompatActivity() {
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        LanguageManager.translateDialog(dialog)
         dialog.show()
     }
 
@@ -178,4 +179,3 @@ class TravelHistory : AppCompatActivity() {
         tvEmpty.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE
     }
 }
-

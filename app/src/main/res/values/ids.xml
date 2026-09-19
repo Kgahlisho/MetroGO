@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tag_original_text" type="id" />
+    <item name="tag_translated_text" type="id" />
+    <item name="tag_original_hint" type="id" />
+    <item name="tag_translated_hint" type="id" />
+    <item name="tag_layout_listener" type="id" />
+</resources>

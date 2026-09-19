@@ -201,6 +201,7 @@ class Dashboard : AppCompatActivity() {
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        LanguageManager.translateDialog(dialog)
         dialog.show()
     }
 
@@ -256,6 +257,7 @@ class Dashboard : AppCompatActivity() {
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        LanguageManager.translateDialog(dialog)
         dialog.show()
     }
 }

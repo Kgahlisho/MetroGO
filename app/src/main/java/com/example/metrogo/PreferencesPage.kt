@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Switch
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +21,6 @@ class PreferencesPage : AppCompatActivity() {
 
     private lateinit var prefs: SharedPreferences
 
-    private val languages = arrayOf("English", "Afrikaans", "isiZulu", "isiXhosa", "Sepedi")
     private val textSizes = arrayOf("Small", "Medium", "Large")
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,23 +68,27 @@ class PreferencesPage : AppCompatActivity() {
             finish()
         }
 
-        // Changing the Applicatoin Language via utilising an API
+        // App language -- translated on-device with Google's ML Kit Translation API
+        // (see LanguageManager). The choice is saved and applied to every screen.
         val tvLanguageValue = findViewById<TextView>(R.id.tvLanguageValue)
-        tvLanguageValue.text = prefs.getString("app_language", "English")
+        tvLanguageValue.text = LanguageManager.getSelected().nativeName
 
         val rowLanguage = findViewById<LinearLayout>(R.id.rowLanguage)
         rowLanguage.setOnClickListener {
-            val current = languages.indexOf(tvLanguageValue.text.toString()).coerceAtLeast(0)
+            val options = LanguageManager.languages
+            val current = options
+                .indexOfFirst { it.code == LanguageManager.getSelected().code }
+                .coerceAtLeast(0)
+
             AlertDialog.Builder(this)
-                .setTitle("App Language")
-                .setSingleChoiceItems(languages, current) { dialog, which ->
-                    val selected = languages[which]
-                    tvLanguageValue.text = selected
-                    prefs.edit().putString("app_language", selected).apply()
-                    // TODO: actually apply the locale change (Configuration/AppCompatDelegate.setApplicationLocales)
+                .setTitle(LanguageManager.tr("App Language"))
+                .setSingleChoiceItems(
+                    options.map { it.nativeName }.toTypedArray(), current
+                ) { dialog, which ->
                     dialog.dismiss()
+                    changeLanguage(options[which], tvLanguageValue)
                 }
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(LanguageManager.tr("Cancel"), null)
                 .show()
         }
 
@@ -113,17 +117,20 @@ class PreferencesPage : AppCompatActivity() {
 
         val rowTextSize = findViewById<LinearLayout>(R.id.rowTextSize)
         rowTextSize.setOnClickListener {
-            val current = textSizes.indexOf(tvTextSizeValue.text.toString()).coerceAtLeast(0)
+            // Read the saved value (not the label on screen, which may be translated).
+            val current = textSizes.indexOf(prefs.getString("text_size", "Medium")).coerceAtLeast(0)
             AlertDialog.Builder(this)
-                .setTitle("Text Size")
-                .setSingleChoiceItems(textSizes, current) { dialog, which ->
+                .setTitle(LanguageManager.tr("Text Size"))
+                .setSingleChoiceItems(
+                    textSizes.map { LanguageManager.tr(it) }.toTypedArray(), current
+                ) { dialog, which ->
                     val selected = textSizes[which]
                     tvTextSizeValue.text = selected
                     prefs.edit().putString("text_size", selected).apply()
                     // TODO: apply the chosen scale app-wide (e.g. via a custom font-scale wrapper)
                     dialog.dismiss()
                 }
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(LanguageManager.tr("Cancel"), null)
                 .show()
         }
 
@@ -136,6 +143,38 @@ class PreferencesPage : AppCompatActivity() {
         }
 
 
+    }
+
+    /**
+     * Downloads the language model if needed, then saves the choice and switches the app.
+     * The choice is only saved once the language is actually usable.
+     */
+    private fun changeLanguage(language: LanguageManager.Language, label: TextView) {
+        if (language.code == LanguageManager.getSelected().code) return
+
+        if (!language.isEnglish) {
+            Toast.makeText(
+                this, "Preparing ${language.name} language pack\u2026", Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        LanguageManager.prepare(language) { ok ->
+            if (ok) {
+                LanguageManager.setSelected(language)
+                label.text = language.nativeName
+                LanguageManager.onLanguageChanged()
+                Toast.makeText(
+                    this, "Language changed to ${language.nativeName}", Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    this,
+                    "Couldn't download the ${language.name} language pack. " +
+                            "Check your internet connection and try again.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
     }
 
 }
