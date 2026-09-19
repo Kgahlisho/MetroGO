@@ -3,22 +3,34 @@ package com.example.metrogo
 import android.app.Dialog
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class Dashboard : AppCompatActivity() {
 
     private val currencyFormat = DecimalFormat("#,##0.00")
+
+    companion object {
+        /** The balance (in rand) at which the credit progress bar shows as full. */
+        private const val CREDIT_BAR_MAX = 5000
+    }
 
     // Kept so the tap-to-enlarge dialog can reuse the same QR bitmap/caption
     // that is currently shown on the dashboard, without regenerating it.
@@ -49,6 +61,9 @@ class Dashboard : AppCompatActivity() {
             val intent = Intent(this , NotificationPage::class.java)
             startActivity(intent)
         }
+
+        // Tapping the balance card opens the wallet overview pop-up.
+        findViewById<View>(R.id.balanceCard).setOnClickListener { showBalanceDetailsDialog() }
 
         val pillPurchaseTicket = findViewById<LinearLayout>(R.id.pillPurchaseTicket)
         pillPurchaseTicket.setOnClickListener{
@@ -88,6 +103,105 @@ class Dashboard : AppCompatActivity() {
     private fun refreshWalletBalance() {
         val balance = TicketManager.getBalance(this)
         findViewById<TextView>(R.id.tvBalance).text = "R${currencyFormat.format(balance)}"
+
+        // Credit progress bar: how much of CREDIT_BAR_MAX the user currently holds.
+        val percent = ((balance.toLong() * 100) / CREDIT_BAR_MAX).toInt().coerceIn(0, 100)
+        findViewById<ProgressBar>(R.id.pbCredit).progress = percent
+        findViewById<TextView>(R.id.tvCreditCaption).text =
+            "$percent% of R${DecimalFormat("#,##0").format(CREDIT_BAR_MAX)}"
+    }
+
+    /** Professional wallet overview: credits, last purchase, last top-up and XP level. */
+    private fun showBalanceDetailsDialog() {
+        val dialog = Dialog(this)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setContentView(R.layout.dialog_balance_details)
+
+        dialog.findViewById<ImageView>(R.id.btnCloseBalanceDialog).setOnClickListener { dialog.dismiss() }
+        dialog.findViewById<TextView>(R.id.btnDialogTopUp).setOnClickListener {
+            dialog.dismiss()
+            startActivity(Intent(this, Wallet::class.java))
+        }
+
+        // ---- Header: available credits + progress ----
+        val balance = TicketManager.getBalance(this)
+        val percent = ((balance.toLong() * 100) / CREDIT_BAR_MAX).toInt().coerceIn(0, 100)
+        dialog.findViewById<TextView>(R.id.tvDialogBalance).text = "R${currencyFormat.format(balance)}"
+        dialog.findViewById<ProgressBar>(R.id.pbDialogCredit).progress = percent
+        dialog.findViewById<TextView>(R.id.tvDialogCreditCaption).text =
+            "$percent% of R${DecimalFormat("#,##0").format(CREDIT_BAR_MAX)}"
+
+        // ---- Body ----
+        val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+        val container = dialog.findViewById<LinearLayout>(R.id.layoutBalanceRows)
+        val inflater = LayoutInflater.from(this)
+
+        fun addRow(
+            iconRes: Int,
+            label: String,
+            value: String,
+            sub: String,
+            progress: Int? = null,
+            isLast: Boolean = false
+        ) {
+            val row = inflater.inflate(R.layout.item_balance_detail, container, false)
+            row.findViewById<ImageView>(R.id.ivDetailIcon).setImageResource(iconRes)
+            row.findViewById<TextView>(R.id.tvDetailLabel).text = label
+            row.findViewById<TextView>(R.id.tvDetailValue).text = value
+            row.findViewById<TextView>(R.id.tvDetailSub).text = sub
+            if (progress != null) {
+                val pb = row.findViewById<ProgressBar>(R.id.pbDetail)
+                pb.progress = progress
+                pb.visibility = View.VISIBLE
+            }
+            if (isLast) row.findViewById<View>(R.id.viewDetailDivider).visibility = View.GONE
+            container.addView(row)
+        }
+
+        // Last purchase: the most recent ticket the user bought.
+        val lastTrip = TicketManager.getTripHistory(this).firstOrNull()
+        if (lastTrip != null) {
+            addRow(
+                R.drawable.ic_ticket,
+                "LAST PURCHASE",
+                "R${currencyFormat.format(lastTrip.ticket.price)}",
+                "${lastTrip.route}\n${dateFormat.format(Date(lastTrip.ticket.purchaseTimestamp))}"
+            )
+        } else {
+            addRow(R.drawable.ic_ticket, "LAST PURCHASE", "No purchases yet", "Buy a ticket to see it here")
+        }
+
+        // Last top-up: the most recent wallet top-up.
+        val lastTopUp = WalletTransactionStore.getAll(this)
+            .firstOrNull { it.type == WalletTransaction.TYPE_TOPUP }
+        if (lastTopUp != null) {
+            addRow(
+                R.drawable.ic_wallet,
+                "LAST CREDIT TOP-UP",
+                "R${currencyFormat.format(lastTopUp.amount)}",
+                dateFormat.format(Date(lastTopUp.timestamp))
+            )
+        } else {
+            addRow(R.drawable.ic_wallet, "LAST CREDIT TOP-UP", "No top-ups yet", "Top up your wallet to see it here")
+        }
+
+        // Experience level.
+        val xp = TicketManager.getXpProgress(this)
+        val toNext = TicketManager.XP_PER_LEVEL - xp.xpInLevel
+        addRow(
+            R.drawable.ic_star,
+            "EXPERIENCE LEVEL",
+            "Level ${xp.level}",
+            "${xp.xpInLevel}/${TicketManager.XP_PER_LEVEL} XP \u2022 $toNext XP to Level ${xp.level + 1}",
+            progress = xp.xpInLevel * 100 / TicketManager.XP_PER_LEVEL,
+            isLast = true
+        )
+
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        dialog.show()
     }
 
     private fun refreshBoardingPass() {

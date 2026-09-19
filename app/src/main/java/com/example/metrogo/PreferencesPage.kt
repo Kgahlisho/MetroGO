@@ -20,9 +20,7 @@ class PreferencesPage : AppCompatActivity() {
 
     private lateinit var prefs: SharedPreferences
 
-    // Keeping the option lists here means adding a new language/size later
-    // only requires editing this array, not the click-handling logic below.
-    private val languages = arrayOf("English", "Afrikaans", "isiZulu", "isiXhosa", "Sesotho")
+    private val languages = arrayOf("English", "Afrikaans", "isiZulu", "isiXhosa", "Sepedi")
     private val textSizes = arrayOf("Small", "Medium", "Large")
 
     override fun onCreate(savedInstanceState: Bundle?) {

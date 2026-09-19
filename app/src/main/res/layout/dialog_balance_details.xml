@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_card_white"
+        android:orientation="vertical">
+
+        <!-- ============ HEADER: available credits ============ -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dialog_header"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/tvBalanceDialogTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:alpha="0.7"
+                android:text="WALLET OVERVIEW"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@id/btnCloseBalanceDialog"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btnCloseBalanceDialog"
+                app:layout_constraintBottom_toBottomOf="@id/btnCloseBalanceDialog" />
+
+            <ImageView
+                android:id="@+id/btnCloseBalanceDialog"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:contentDescription="Close"
+                android:padding="4dp"
+                android:src="@drawable/ic_close_circle_red"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvDialogBalanceLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:alpha="0.7"
+                android:text="Available credits"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/btnCloseBalanceDialog" />
+
+            <TextView
+                android:id="@+id/tvDialogBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="R0.00"
+                android:textColor="@color/white"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDialogBalanceLabel" />
+
+            <ProgressBar
+                android:id="@+id/pbDialogCredit"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="0dp"
+                android:layout_height="8dp"
+                android:layout_marginTop="14dp"
+                android:max="100"
+                android:progress="0"
+                android:progressDrawable="@drawable/progress_credit"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tvDialogBalance" />
+
+            <TextView
+                android:id="@+id/tvDialogCreditCaption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:alpha="0.7"
+                android:textColor="@color/white"
+                android:textSize="11sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pbDialogCredit" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- ============ BODY: last purchase / last top-up / level ============ -->
+        <LinearLayout
+            android:id="@+id/layoutBalanceRows"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="6dp" />
+
+        <!-- ============ FOOTER ============ -->
+        <TextView
+            android:id="@+id/btnDialogTopUp"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/bg_button_teal"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="Top up wallet"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

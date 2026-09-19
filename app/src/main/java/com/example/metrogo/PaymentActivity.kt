@@ -17,6 +17,11 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import java.text.DecimalFormat
 import java.util.Locale
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 
 class PaymentActivity : AppCompatActivity() {
 
@@ -25,6 +30,8 @@ class PaymentActivity : AppCompatActivity() {
     private var fareHoldTimer : CountDownTimer? = null
 
     private val currencyFormat = DecimalFormat("#,##0.00")
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* nothing to do either way */ }
     private fun rand(amount: Number): String = "R${currencyFormat.format(amount)}"
 
 
@@ -46,6 +53,13 @@ class PaymentActivity : AppCompatActivity() {
             return
         }
         busRoute = extraRoute
+
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
 
 
 
@@ -130,7 +144,12 @@ class PaymentActivity : AppCompatActivity() {
     private fun attemptPayment() {
         val insufficientFundsRow = findViewById<LinearLayout>(R.id.tvInsufficientFunds)
 
-        val success = TicketManager.deduct(this, busRoute.price)
+        val success = TicketManager.deduct(
+            this,
+            busRoute.price,
+            "Ticket: ${busRoute.origin} \u2192 ${busRoute.destination}"
+        )
+
         if (!success) {
             insufficientFundsRow.visibility = View.VISIBLE
             return
@@ -158,12 +177,10 @@ class PaymentActivity : AppCompatActivity() {
         val xpEarned = TicketManager.addToHistory(this, ticket)
         val levelAfter = TicketManager.getXpProgress(this).level
 
-        val message = buildString {
-            append("Ticket purchased! Your QR code is on the Dashboard.")
-            if (xpEarned > 0) append(" +$xpEarned XP")
-            if (levelAfter > levelBefore) append("\nLevel up! You are now Level $levelAfter")
-        }
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        val newLevel = if (levelAfter > levelBefore) levelAfter else null
+        NotificationHelper.notifyTicketPurchased(this, ticket, xpEarned, newLevel)
+        Toast.makeText(this, "Ticket purchased! Check your notifications.", Toast.LENGTH_SHORT).show()
+
         val intent = Intent(this, Dashboard::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         startActivity(intent)

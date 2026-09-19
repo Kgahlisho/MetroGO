@@ -1,7 +1,11 @@
 package com.example.metrogo
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -10,16 +14,26 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.button.MaterialButton
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class Wallet : AppCompatActivity() {
 
     private val currencyFormat = DecimalFormat("#,##0.00")
     private fun rand(amount: Number): String = "R ${currencyFormat.format(amount)}"
+
+    private val dateFormat = SimpleDateFormat("dd/MM/yy\nHH:mm", Locale.getDefault())
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* nothing to do either way */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +43,14 @@ class Wallet : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+
+        // Android 13+ needs the user's permission before we can show system notifications.
+        if (Build.VERSION.SDK_INT >= 33 &&
+            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
         val circleSettings = findViewById<FrameLayout>(R.id.circleSettings)
@@ -55,6 +77,7 @@ class Wallet : AppCompatActivity() {
         }
 
         refreshBalance()
+        loadTransactions()
         bindQuickAmounts()
         bindTopUpButton()
     }
@@ -64,11 +87,41 @@ class Wallet : AppCompatActivity() {
         // Covers the case where the balance changed elsewhere (e.g. a ticket
         // purchase) while this screen was in the background.
         refreshBalance()
+        loadTransactions()
     }
 
     private fun refreshBalance() {
         val balance = TicketManager.getBalance(this)
         findViewById<TextView>(R.id.tvBalance).text = rand(balance)
+    }
+
+    /** Fills the transaction history table with the most recent wallet activity. */
+    private fun loadTransactions() {
+        val container = findViewById<LinearLayout>(R.id.layoutTransactionRows)
+        val tvEmpty = findViewById<TextView>(R.id.tvNoTransactions)
+        container.removeAllViews()
+
+        val transactions = WalletTransactionStore.getAll(this).take(MAX_ROWS_SHOWN)
+        tvEmpty.visibility = if (transactions.isEmpty()) View.VISIBLE else View.GONE
+
+        val inflater = LayoutInflater.from(this)
+        for (t in transactions) {
+            val row = inflater.inflate(R.layout.item_transaction_row, container, false)
+            val isTopUp = t.type == WalletTransaction.TYPE_TOPUP
+
+            row.findViewById<TextView>(R.id.tvTxDate).text = dateFormat.format(Date(t.timestamp))
+            row.findViewById<TextView>(R.id.tvTxDescription).text = t.description
+
+            val tvAmount = row.findViewById<TextView>(R.id.tvTxAmount)
+            tvAmount.text = (if (isTopUp) "+R" else "-R") + currencyFormat.format(t.amount)
+            tvAmount.setTextColor(
+                if (isTopUp) android.graphics.Color.parseColor("#4CAF50")
+                else android.graphics.Color.parseColor("#F44336")
+            )
+
+            row.findViewById<TextView>(R.id.tvTxBalance).text = "R" + currencyFormat.format(t.balanceAfter)
+            container.addView(row)
+        }
     }
 
     private fun bindQuickAmounts() {
@@ -105,10 +158,16 @@ class Wallet : AppCompatActivity() {
 
             TicketManager.topUp(this, amount)
             refreshBalance()
+            loadTransactions()
+            NotificationHelper.notifyWalletTopUp(this, amount, TicketManager.getBalance(this))
 
             etAmount.text.clear()
             tvSuccess.text = "Wallet topped up successfully with ${rand(amount)}"
             rowSuccess.visibility = View.VISIBLE
         }
+    }
+
+    companion object {
+        private const val MAX_ROWS_SHOWN = 20
     }
 }

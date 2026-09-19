@@ -51,16 +51,19 @@ object TicketManager {
         prefs(context).getInt(KEY_WALLET_BALANCE, DEFAULT_BALANCE)
 
     /** Returns true if the balance was sufficient and the deduction succeeded. */
-    fun deduct(context: Context, amount: Int): Boolean {
+    fun deduct(context: Context, amount: Int, description: String = "Ticket purchase"): Boolean {
         val current = getBalance(context)
         if (current < amount) return false
-        prefs(context).edit().putInt(KEY_WALLET_BALANCE, current - amount).apply()
+        val newBalance = current - amount
+        prefs(context).edit().putInt(KEY_WALLET_BALANCE, newBalance).apply()
+        WalletTransactionStore.add(context, WalletTransaction.TYPE_PURCHASE, description, amount, newBalance)
         return true
     }
 
     fun topUp(context: Context, amount: Int) {
-        val current = getBalance(context)
-        prefs(context).edit().putInt(KEY_WALLET_BALANCE, current + amount).apply()
+        val newBalance = getBalance(context) + amount
+        prefs(context).edit().putInt(KEY_WALLET_BALANCE, newBalance).apply()
+        WalletTransactionStore.add(context, WalletTransaction.TYPE_TOPUP, "Wallet top-up", amount, newBalance)
     }
 
     // ---------------- Active ticket ----------------

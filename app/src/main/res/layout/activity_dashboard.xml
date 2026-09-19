@@ -111,7 +111,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- ============ WELCOME / BALANCE CARD ============ -->
+            <!-- ============ WELCOME CARD ============ -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/welcomeCard"
                 android:layout_width="match_parent"
@@ -142,29 +142,34 @@
                     android:textStyle="bold"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvWelcomeLabel" />
+                    app:layout_constraintTop_toBottomOf="@id/tvWelcomeLabel"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
-                <View
-                    android:id="@+id/dashboardDivider"
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="18dp"
-                    android:background="#33FFFFFF"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/tvWelcomeName" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- ============ BALANCE CARD ============ -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/balanceCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card_dark"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:contentDescription="Available balance. Tap for wallet details."
+                android:padding="20dp">
 
                 <TextView
                     android:id="@+id/tvBalanceLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:text="Available balance"
                     android:textColor="@color/white"
                     android:alpha="0.7"
                     android:textSize="12sp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/dashboardDivider" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:id="@+id/tvBalance"
@@ -178,6 +183,39 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tvBalanceLabel"
                     app:layout_constraintBottom_toBottomOf="parent" />
+
+                <!-- Credit progress bar, beside the balance -->
+                <LinearLayout
+                    android:id="@+id/layoutCredit"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toEndOf="@id/tvBalance"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/tvBalance"
+                    app:layout_constraintBottom_toBottomOf="@id/tvBalance">
+
+                    <ProgressBar
+                        android:id="@+id/pbCredit"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:max="100"
+                        android:progress="0"
+                        android:progressDrawable="@drawable/progress_credit" />
+
+                    <TextView
+                        android:id="@+id/tvCreditCaption"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:alpha="0.7"
+                        android:gravity="end"
+                        android:text="0% of R5,000"
+                        android:textColor="@color/white"
+                        android:textSize="10sp" />
+                </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
