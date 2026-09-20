@@ -84,14 +84,14 @@ class TravelHistory : AppCompatActivity() {
 
     /** Loads the real tickets the user has bought, then refreshes XP + the list. */
     private fun loadTrips() {
-        allTrips = TicketManager.getTripHistory(this)
+        allTrips = TicketStore.getTripHistory(this)
         updateXpBar()
         filterTrips(currentFilter)
     }
 
     private fun updateXpBar() {
-        val progress = TicketManager.getXpProgress(this)
-        val maxXp = TicketManager.XP_PER_LEVEL
+        val progress = TicketStore.getXpProgress(this)
+        val maxXp = TicketStore.XP_PER_LEVEL
 
         pbXp.max = maxXp
         pbXp.progress = progress.xpInLevel
@@ -107,16 +107,19 @@ class TravelHistory : AppCompatActivity() {
         dialog.findViewById<ImageView>(R.id.btnCloseTripDialog).setOnClickListener { dialog.dismiss() }
 
         val t = trip.ticket
+        // Route/stop/time details and the passenger's name live on other tables now.
+        val details = TransportRouteRepository.scheduleDetails(t.scheduleId)
+        val passenger = UserManager.getCurrentUser(this)?.fullName ?: "Guest"
         val rows = listOf(
             "Ticket ID" to t.ticketId,
-            "Passenger" to t.passengerName,
-            "Transport" to t.transportName,
-            "Bus registration" to t.registration,
-            "From" to t.origin,
-            "To" to t.destination,
-            "Departs" to t.departureTime,
-            "Arrives" to t.arrivalTime,
-            "Purchased" to formatDateTime(t.purchaseTimestamp),
+            "Passenger" to passenger,
+            "Transport" to (details?.route?.routeName ?: "--"),
+            "Bus registration" to (details?.schedule?.busRegistration ?: "--"),
+            "From" to (details?.originStop?.stopName ?: "--"),
+            "To" to (details?.destinationStop?.stopName ?: "--"),
+            "Departs" to (details?.schedule?.departureTime ?: "--"),
+            "Arrives" to (details?.schedule?.arrivalTime ?: "--"),
+            "Purchased" to formatDateTime(t.purchaseDate),
             "Fare" to trip.cost,
             "Paid via" to trip.paymentMethod,
             "Status" to if (trip.isPaid) "Paid" else "Not paid",

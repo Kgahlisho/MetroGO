@@ -3,7 +3,9 @@ package com.example.metrogo
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,16 +27,35 @@ class LoginPage : AppCompatActivity() {
             finish()
         }
 
-        val LoginToDash = findViewById<Button>(R.id.LoginToDash)
-        LoginToDash.setOnClickListener {
-            val intent = Intent(this, Dashboard::class.java)
-            startActivity(intent)
-        }
-        val SignUpTwo = findViewById<Button>(R.id.SignUpTwo)
-        SignUpTwo.setOnClickListener {
-            val  intent = Intent(this, RegisterPage::class.java)
-            startActivity(intent)
+        val etEmail = findViewById<EditText>(R.id.etLoginEmail)
+        val etPassword = findViewById<EditText>(R.id.etLoginPassword)
 
+        val loginToDash = findViewById<Button>(R.id.LoginToDash)
+        loginToDash.setOnClickListener {
+            val email = etEmail.text.toString().trim()
+            val password = etPassword.text.toString()
+
+            if (email.isBlank() || password.isBlank()) {
+                Toast.makeText(this, "Please enter your email and password.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            when (val result = UserManager.login(this, email, password)) {
+                is UserManager.AuthResult.Success -> {
+                    val intent = Intent(this, Dashboard::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                }
+                is UserManager.AuthResult.Failure -> {
+                    Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        val signUpTwo = findViewById<Button>(R.id.SignUpTwo)
+        signUpTwo.setOnClickListener {
+            startActivity(Intent(this, RegisterPage::class.java))
         }
     }
 }

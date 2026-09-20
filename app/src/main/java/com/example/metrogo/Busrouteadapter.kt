@@ -6,9 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
+/** Lists departures. Each row is one Schedule joined with its TransportRoute and both BusStops. */
 class BusRouteAdapter(
-    private val routes: List<BusRoute>,
-    private val onSelect: (BusRoute) -> Unit
+    private val schedules: List<TransportRouteRepository.ScheduleDetails>,
+    private val onSelect: (TransportRouteRepository.ScheduleDetails) -> Unit
 ) : RecyclerView.Adapter<BusRouteAdapter.BusRouteViewHolder>() {
 
     class BusRouteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -26,17 +27,17 @@ class BusRouteAdapter(
     }
 
     override fun onBindViewHolder(holder: BusRouteViewHolder, position: Int) {
-        val route = routes[position]
-        holder.tvTransportName.text = route.transportName
-        holder.tvRoute.text = "${route.origin} \u2192 ${route.destination}"
-        holder.tvDeparture.text = "Departs ${route.departureTime}"
-        holder.tvArrival.text = "Arrives ${route.arrivalTime}"
-        holder.tvPrice.text = "R${route.price}"
+        val item = schedules[position]
+        holder.tvTransportName.text = item.route.routeName
+        holder.tvRoute.text = "${item.originStop.stopName} \u2192 ${item.destinationStop.stopName}"
+        holder.tvDeparture.text = "Departs ${item.schedule.departureTime}"
+        holder.tvArrival.text = "Arrives ${item.schedule.arrivalTime}"
+        holder.tvPrice.text = "R${item.schedule.price}"
 
-        val selectAction = { onSelect(route) }
+        val selectAction = { onSelect(item) }
         holder.btnSelect.setOnClickListener { selectAction() }
         holder.itemView.setOnClickListener { selectAction() }
     }
 
-    override fun getItemCount() = routes.size
+    override fun getItemCount() = schedules.size
 }

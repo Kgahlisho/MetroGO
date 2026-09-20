@@ -38,6 +38,15 @@ class Dashboard : AppCompatActivity() {
     private var currentBoardingStatus: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (!UserManager.isLoggedIn(this)) {
+            val intent = Intent(this, LoginPage::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+            return
+        }
+
         enableEdgeToEdge()
         setContentView(R.layout.activity_dashboard)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -98,10 +107,16 @@ class Dashboard : AppCompatActivity() {
         // PurchaseTicket/PaymentActivity -- or a top-up made on Wallet -- shows up immediately.
         refreshWalletBalance()
         refreshBoardingPass()
+        refreshWelcomeName()
+    }
+
+    private fun refreshWelcomeName() {
+        val name = UserManager.getCurrentUser(this)?.fullName ?: "Guest"
+        findViewById<TextView>(R.id.tvWelcomeName).text = name
     }
 
     private fun refreshWalletBalance() {
-        val balance = TicketManager.getBalance(this)
+        val balance = TransportCardManager.getBalance(this)
         findViewById<TextView>(R.id.tvBalance).text = "R${currencyFormat.format(balance)}"
 
         // Credit progress bar: how much of CREDIT_BAR_MAX the user currently holds.
@@ -124,7 +139,7 @@ class Dashboard : AppCompatActivity() {
         }
 
         // ---- Header: available credits + progress ----
-        val balance = TicketManager.getBalance(this)
+        val balance = TransportCardManager.getBalance(this)
         val percent = ((balance.toLong() * 100) / CREDIT_BAR_MAX).toInt().coerceIn(0, 100)
         dialog.findViewById<TextView>(R.id.tvDialogBalance).text = "R${currencyFormat.format(balance)}"
         dialog.findViewById<ProgressBar>(R.id.pbDialogCredit).progress = percent
@@ -159,41 +174,41 @@ class Dashboard : AppCompatActivity() {
         }
 
         // Last purchase: the most recent ticket the user bought.
-        val lastTrip = TicketManager.getTripHistory(this).firstOrNull()
+        val lastTrip = TicketStore.getTripHistory(this).firstOrNull()
         if (lastTrip != null) {
             addRow(
                 R.drawable.ic_ticket,
                 "LAST PURCHASE",
                 "R${currencyFormat.format(lastTrip.ticket.price)}",
-                "${lastTrip.route}\n${dateFormat.format(Date(lastTrip.ticket.purchaseTimestamp))}"
+                "${lastTrip.route}\n${dateFormat.format(Date(lastTrip.ticket.purchaseDate))}"
             )
         } else {
             addRow(R.drawable.ic_ticket, "LAST PURCHASE", "No purchases yet", "Buy a ticket to see it here")
         }
 
         // Last top-up: the most recent wallet top-up.
-        val lastTopUp = WalletTransactionStore.getAll(this)
-            .firstOrNull { it.type == WalletTransaction.TYPE_TOPUP }
+        val lastTopUp = PaymentStore.getAll(this)
+            .firstOrNull { it.type == Payment.TYPE_TOPUP }
         if (lastTopUp != null) {
             addRow(
                 R.drawable.ic_wallet,
                 "LAST CREDIT TOP-UP",
                 "R${currencyFormat.format(lastTopUp.amount)}",
-                dateFormat.format(Date(lastTopUp.timestamp))
+                dateFormat.format(Date(lastTopUp.paymentDate))
             )
         } else {
             addRow(R.drawable.ic_wallet, "LAST CREDIT TOP-UP", "No top-ups yet", "Top up your wallet to see it here")
         }
 
         // Experience level.
-        val xp = TicketManager.getXpProgress(this)
-        val toNext = TicketManager.XP_PER_LEVEL - xp.xpInLevel
+        val xp = TicketStore.getXpProgress(this)
+        val toNext = TicketStore.XP_PER_LEVEL - xp.xpInLevel
         addRow(
             R.drawable.ic_star,
             "EXPERIENCE LEVEL",
             "Level ${xp.level}",
-            "${xp.xpInLevel}/${TicketManager.XP_PER_LEVEL} XP \u2022 $toNext XP to Level ${xp.level + 1}",
-            progress = xp.xpInLevel * 100 / TicketManager.XP_PER_LEVEL,
+            "${xp.xpInLevel}/${TicketStore.XP_PER_LEVEL} XP \u2022 $toNext XP to Level ${xp.level + 1}",
+            progress = xp.xpInLevel * 100 / TicketStore.XP_PER_LEVEL,
             isLast = true
         )
 
@@ -210,8 +225,10 @@ class Dashboard : AppCompatActivity() {
         val statusText = findViewById<TextView>(R.id.tvBoardingStatus)
         val tapToEnlargeLabel = findViewById<TextView>(R.id.tvTapToEnlarge)
 
-        val ticket = TicketManager.getActiveTicket(this)
-        if (ticket == null) {
+        val ticket = TicketStore.getActiveTicket(this)
+        // Route/stop/time details are resolved through the Schedule -> Route -> BusStop join.
+        val details = ticket?.let { TransportRouteRepository.scheduleDetails(it.scheduleId) }
+        if (ticket == null || details == null) {
             qrImageView.setImageDrawable(null)
             statusText.text = "No active boarding pass\nPurchase a ticket to get one"
             currentQrBitmap = null
@@ -221,13 +238,14 @@ class Dashboard : AppCompatActivity() {
             return
         }
 
-        val qrBitmap = TicketManager.generateQrBitmap(ticket.toQrPayload())
+        val passengerName = UserManager.getCurrentUser(this)?.fullName ?: "Guest"
+        val qrBitmap = TicketStore.generateQrBitmap(ticket.toQrPayload(passengerName, details))
         qrImageView.setImageBitmap(qrBitmap)
 
         statusText.textSize = 12f
-        statusText.text = "Active: ${ticket.transportName}\n" +
-                "${ticket.origin} \u2192 ${ticket.destination}\n" +
-                "Departs ${ticket.departureTime} \u2022 Bus ${ticket.registration}"
+        statusText.text = "Active: ${details.route.routeName}\n" +
+                "${details.originStop.stopName} \u2192 ${details.destinationStop.stopName}\n" +
+                "Departs ${details.schedule.departureTime} \u2022 Bus ${details.schedule.busRegistration}"
 
         // Cache the current QR + caption so the enlarged dialog shows exactly
         // what's on the dashboard, and wire up the tap-to-enlarge affordance.

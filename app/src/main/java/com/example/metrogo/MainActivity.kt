@@ -24,6 +24,14 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        if (UserManager.isLoggedIn(this)) {
+            val intent = Intent(this, Dashboard::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+            return
+        }
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

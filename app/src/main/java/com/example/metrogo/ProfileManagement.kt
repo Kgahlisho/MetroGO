@@ -55,6 +55,24 @@ class ProfileManagement : AppCompatActivity() {
         val etMobile = findViewById<EditText>(R.id.etMobile)
         val etEmail = findViewById<EditText>(R.id.etEmail)
 
+        val currentUser = UserManager.getCurrentUser(this)
+        if (currentUser == null) {
+            // No one is logged in -- nothing to show or edit here.
+            Toast.makeText(this, "Please log in first.", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, LoginPage::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+            return
+        }
+
+        etFullName.setText(currentUser.fullName)
+        etIdNumber.setText(currentUser.idNumber)
+        etDob.setText(currentUser.dob)
+        etMobile.setText(currentUser.mobile)
+        etEmail.setText(currentUser.email)
+        etEmail.isEnabled = false // email is the account identifier -- not editable here
+
         // Snapshot of the values loaded from the profile, used to restore on Cancel
         val originalFullName = etFullName.text.toString()
         val originalIdNumber = etIdNumber.text.toString()
@@ -81,8 +99,22 @@ class ProfileManagement : AppCompatActivity() {
             if (etFullName.text.isBlank() || etMobile.text.isBlank() || etEmail.text.isBlank()) {
                 Toast.makeText(this, "Full name, mobile number and email are required", Toast.LENGTH_SHORT).show()
             } else {
-                // TODO: persist the updated profile details to the backend
-                Toast.makeText(this, "Profile changes saved", Toast.LENGTH_SHORT).show()
+                // The screen still has one "full name" box; the table stores firstName and
+                // surname separately, so split on the first space (rest of the text = surname).
+                val nameParts = etFullName.text.toString().trim().split(Regex("\\s+"), limit = 2)
+                val saved = UserManager.updateProfile(
+                    this,
+                    firstName = nameParts[0],
+                    surname = nameParts.getOrElse(1) { "" },
+                    mobile = etMobile.text.toString(),
+                    idNumber = etIdNumber.text.toString(),
+                    dob = etDob.text.toString()
+                )
+                if (saved) {
+                    Toast.makeText(this, "Profile changes saved", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Couldn't save -- please log in again.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -103,7 +135,7 @@ class ProfileManagement : AppCompatActivity() {
                 .setTitle("Delete Account")
                 .setMessage("This will permanently delete your MetroGO account. This action cannot be undone.")
                 .setPositiveButton("Delete") { _, _ ->
-                    // TODO: call the account-deletion endpoint before navigating away
+                    UserManager.deleteAccount(this)
                     val loginIntent = Intent(this, LoginPage::class.java)
                     loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(loginIntent)

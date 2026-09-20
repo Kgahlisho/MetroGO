@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat
 class PaymentActivity : AppCompatActivity() {
 
 
-    private lateinit var busRoute: BusRoute
+    private lateinit var details: TransportRouteRepository.ScheduleDetails
     private var fareHoldTimer : CountDownTimer? = null
 
     private val currencyFormat = DecimalFormat("#,##0.00")
@@ -46,13 +46,14 @@ class PaymentActivity : AppCompatActivity() {
             insets
         }
 
-        val extraRoute = intent.getSerializableExtra(EXTRA_BUS_ROUTE) as? BusRoute
-        if (extraRoute == null) {
+        val resolved = intent.getStringExtra(EXTRA_SCHEDULE_ID)
+            ?.let { TransportRouteRepository.scheduleDetails(it) }
+        if (resolved == null) {
             Toast.makeText(this, "No bus selected.", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
-        busRoute = extraRoute
+        details = resolved
 
         if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -92,28 +93,29 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     private fun bindTripSummary() {
-        findViewById<TextView>(R.id.tvTransportName).text = busRoute.transportName
-        findViewById<TextView>(R.id.tvPrice).text = rand(busRoute.price)
+        val schedule = details.schedule
+        findViewById<TextView>(R.id.tvTransportName).text = details.route.routeName
+        findViewById<TextView>(R.id.tvPrice).text = rand(schedule.price)
 
-        findViewById<TextView>(R.id.tvOrigin).text = busRoute.origin
-        findViewById<TextView>(R.id.tvDestination).text = busRoute.destination
-        findViewById<TextView>(R.id.tvOriginTime).text = "Departs ${busRoute.departureTime}"
-        findViewById<TextView>(R.id.tvDestinationTime).text = "Arrives ${busRoute.arrivalTime}"
-        findViewById<TextView>(R.id.tvDuration).text = "${busRoute.durationMinutes} min"
-        findViewById<TextView>(R.id.tvRegistration).text = busRoute.registration
+        findViewById<TextView>(R.id.tvOrigin).text = details.originStop.stopName
+        findViewById<TextView>(R.id.tvDestination).text = details.destinationStop.stopName
+        findViewById<TextView>(R.id.tvOriginTime).text = "Departs ${schedule.departureTime}"
+        findViewById<TextView>(R.id.tvDestinationTime).text = "Arrives ${schedule.arrivalTime}"
+        findViewById<TextView>(R.id.tvDuration).text = "${schedule.durationMinutes} min"
+        findViewById<TextView>(R.id.tvRegistration).text = schedule.busRegistration
 
         // Service fee is a flat R0.00 for now (static in the layout) -- fare is the only
         // line item, so both totals just mirror the fare price.
-        findViewById<TextView>(R.id.tvTotalAmount).text = rand(busRoute.price)
-        findViewById<TextView>(R.id.tvTotalInline).text = rand(busRoute.price)
+        findViewById<TextView>(R.id.tvTotalAmount).text = rand(schedule.price)
+        findViewById<TextView>(R.id.tvTotalInline).text = rand(schedule.price)
     }
 
 
     private fun bindWalletBalance() {
-        val balance = TicketManager.getBalance(this)
+        val balance = TransportCardManager.getBalance(this)
         findViewById<TextView>(R.id.tvWalletBalance).text = rand(balance)
 
-        val afterBalance = (balance - busRoute.price).coerceAtLeast(0)
+        val afterBalance = (balance - details.schedule.price).coerceAtLeast(0)
         findViewById<TextView>(R.id.tvWalletAfter).text = "Balance after payment: ${rand(afterBalance)}"
     }
 
@@ -144,10 +146,25 @@ class PaymentActivity : AppCompatActivity() {
     private fun attemptPayment() {
         val insufficientFundsRow = findViewById<LinearLayout>(R.id.tvInsufficientFunds)
 
-        val success = TicketManager.deduct(
+        val userId = UserManager.getCurrentUserId(this)
+        if (userId == null) {
+            Toast.makeText(this, "Please log in first.", Toast.LENGTH_SHORT).show()
+            val loginIntent = Intent(this, LoginPage::class.java)
+            loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(loginIntent)
+            finish()
+            return
+        }
+
+        val price = details.schedule.price
+        // The ticket id is generated up front so the Payment row can reference it (FK).
+        val ticketId = TicketStore.newTicketId()
+
+        val success = TransportCardManager.deduct(
             this,
-            busRoute.price,
-            "Ticket: ${busRoute.origin} \u2192 ${busRoute.destination}"
+            price,
+            "Ticket: ${details.originStop.stopName} \u2192 ${details.destinationStop.stopName}",
+            ticketId
         )
 
         if (!success) {
@@ -161,21 +178,16 @@ class PaymentActivity : AppCompatActivity() {
 
 
         val ticket = Ticket(
-            ticketId = TicketManager.newTicketId(),
-            passengerName = "John Doe", // TODO: pull from the signed-in user's profile once auth is wired up
-            transportName = busRoute.transportName,
-            origin = busRoute.origin,
-            destination = busRoute.destination,
-            departureTime = busRoute.departureTime,
-            arrivalTime = busRoute.arrivalTime,
-            registration = busRoute.registration,
-            price = busRoute.price,
-            purchaseTimestamp = System.currentTimeMillis()
+            ticketId = ticketId,
+            userId = userId,
+            scheduleId = details.schedule.scheduleId,
+            price = price // snapshot of what was actually paid
         )
-        val levelBefore = TicketManager.getXpProgress(this).level
-        TicketManager.saveActiveTicket(this, ticket)
-        val xpEarned = TicketManager.addToHistory(this, ticket)
-        val levelAfter = TicketManager.getXpProgress(this).level
+        val levelBefore = TicketStore.getXpProgress(this).level
+        TicketStore.saveActiveTicket(this, ticket)
+        val xpEarned = TicketStore.addToHistory(this, ticket)
+        TravelHistoryStore.add(this, ticket)
+        val levelAfter = TicketStore.getXpProgress(this).level
 
         val newLevel = if (levelAfter > levelBefore) levelAfter else null
         NotificationHelper.notifyTicketPurchased(this, ticket, xpEarned, newLevel)
@@ -188,8 +200,6 @@ class PaymentActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val EXTRA_BUS_ROUTE = "extra_bus_route"
+        const val EXTRA_SCHEDULE_ID = "extra_schedule_id"
     }
 }
-
-

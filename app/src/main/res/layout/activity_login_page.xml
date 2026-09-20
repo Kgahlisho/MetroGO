@@ -143,7 +143,7 @@
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <EditText
-                    android:id="@+id/editTextText5"
+                    android:id="@+id/etLoginEmail"
                     android:layout_width="0dp"
                     android:layout_height="46dp"
                     android:layout_marginTop="6dp"
@@ -166,12 +166,12 @@
                     android:text="Password:"
                     android:textColor="@color/text_gray"
                     android:textSize="13sp"
-                    app:layout_constraintTop_toBottomOf="@id/editTextText5"
+                    app:layout_constraintTop_toBottomOf="@id/etLoginEmail"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <EditText
-                    android:id="@+id/editTextText6"
+                    android:id="@+id/etLoginPassword"
                     android:layout_width="0dp"
                     android:layout_height="46dp"
                     android:layout_marginTop="6dp"
@@ -200,7 +200,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/editTextText6" />
+                    app:layout_constraintTop_toBottomOf="@id/etLoginPassword" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

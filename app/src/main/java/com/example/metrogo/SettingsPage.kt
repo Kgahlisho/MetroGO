@@ -49,8 +49,8 @@ class SettingsPage : AppCompatActivity() {
 
         val rowProfileManagement = findViewById<LinearLayout>(R.id.rowProfileManagement)
         rowProfileManagement.setOnClickListener {
-         val intent = Intent(this, ProfileManagement::class.java)
-       startActivity(intent)
+            val intent = Intent(this, ProfileManagement::class.java)
+            startActivity(intent)
         }
 
         val rowNotifications = findViewById<LinearLayout>(R.id.rowNotifications)
@@ -79,6 +79,7 @@ class SettingsPage : AppCompatActivity() {
                 .setTitle("Log Out")
                 .setMessage("Are you sure you want to log out of MetroGO?")
                 .setPositiveButton("Log Out") { _, _ ->
+                    UserManager.logout(this)
                     val loginIntent = Intent(this, LoginPage::class.java)
                     loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(loginIntent)

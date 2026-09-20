@@ -45,13 +45,13 @@ class PurchaseTicket : AppCompatActivity() {
     }
 
     private fun setupBusList() {
-        val availableBuses = BusRouteRepository.sampleRoutes
+        val availableBuses = TransportRouteRepository.allScheduleDetails()
 
         val rvBuses = findViewById<RecyclerView>(R.id.rvBuses)
         rvBuses.layoutManager = LinearLayoutManager(this)
-        rvBuses.adapter = BusRouteAdapter(availableBuses) { selectedRoute ->
+        rvBuses.adapter = BusRouteAdapter(availableBuses) { selected ->
             val intent = Intent(this, PaymentActivity::class.java)
-            intent.putExtra(PaymentActivity.EXTRA_BUS_ROUTE, selectedRoute)
+            intent.putExtra(PaymentActivity.EXTRA_SCHEDULE_ID, selected.schedule.scheduleId)
             startActivity(intent)
         }
 

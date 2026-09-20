@@ -30,6 +30,9 @@ object WalletTransactionStore {
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    private fun userKey(context: Context): String =
+        UserManager.getCurrentUser(context)?.email ?: "guest"
+
     fun add(context: Context, type: String, description: String, amount: Int, balanceAfter: Int) {
         val transaction = WalletTransaction(
             id = UUID.randomUUID().toString(),
@@ -53,11 +56,11 @@ object WalletTransactionStore {
                     .put("timestamp", t.timestamp)
             )
         }
-        prefs(context).edit().putString(KEY_TRANSACTIONS, array.toString()).apply()
+        prefs(context).edit().putString("$KEY_TRANSACTIONS:${userKey(context)}", array.toString()).apply()
     }
 
     fun getAll(context: Context): List<WalletTransaction> {
-        val json = prefs(context).getString(KEY_TRANSACTIONS, null) ?: return emptyList()
+        val json = prefs(context).getString("$KEY_TRANSACTIONS:${userKey(context)}", null) ?: return emptyList()
         return try {
             val array = JSONArray(json)
             val list = mutableListOf<WalletTransaction>()
@@ -78,5 +81,10 @@ object WalletTransactionStore {
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    /** Wipes this specific user's transaction history. Called when their account is deleted. */
+    fun clearAllDataForUser(context: Context, email: String) {
+        prefs(context).edit().remove("$KEY_TRANSACTIONS:$email").apply()
     }
 }

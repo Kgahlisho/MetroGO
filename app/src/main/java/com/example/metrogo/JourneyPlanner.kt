@@ -115,9 +115,9 @@ class JourneyPlanner : AppCompatActivity() {
     }
 
     private fun showStationSelectionDialog(type: String) {
-        // Pulled from the same repository PurchaseTicket uses, so every station shown here
-        // is guaranteed to actually match a real route's origin/destination.
-        val stations = BusRouteRepository.stationNames.toTypedArray()
+        // Pulled from the BusStop table, so every station shown here is guaranteed to
+        // match a real route's origin/destination stop.
+        val stations = TransportRouteRepository.stationNames.toTypedArray()
 
         androidx.appcompat.app.AlertDialog.Builder(this)
             .setTitle("Select $type Station")
@@ -155,24 +155,24 @@ class JourneyPlanner : AppCompatActivity() {
             return
         }
 
-        val matchingRoutes = BusRouteRepository.routesBetween(from, to)
-        val otherRoutes = BusRouteRepository.routesExcluding(from, to)
+        val matchingRoutes = TransportRouteRepository.scheduleDetailsBetween(from, to)
+        val otherRoutes = TransportRouteRepository.scheduleDetailsExcluding(from, to)
 
         tvMatchingSubtitle.text = "$from \u2192 $to"
         tvNoMatches.visibility = if (matchingRoutes.isEmpty()) View.VISIBLE else View.GONE
         rvMatchingBuses.visibility = if (matchingRoutes.isEmpty()) View.GONE else View.VISIBLE
 
-        rvMatchingBuses.adapter = BusRouteAdapter(matchingRoutes) { selectedRoute ->
-            openPayment(selectedRoute)
+        rvMatchingBuses.adapter = BusRouteAdapter(matchingRoutes) { selected ->
+            openPayment(selected)
         }
-        rvOtherBuses.adapter = BusRouteAdapter(otherRoutes) { selectedRoute ->
-            openPayment(selectedRoute)
+        rvOtherBuses.adapter = BusRouteAdapter(otherRoutes) { selected ->
+            openPayment(selected)
         }
     }
 
-    private fun openPayment(route: BusRoute) {
+    private fun openPayment(selected: TransportRouteRepository.ScheduleDetails) {
         val intent = Intent(this, PaymentActivity::class.java)
-        intent.putExtra(PaymentActivity.EXTRA_BUS_ROUTE, route)
+        intent.putExtra(PaymentActivity.EXTRA_SCHEDULE_ID, selected.schedule.scheduleId)
         startActivity(intent)
     }
 }

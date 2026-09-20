@@ -91,7 +91,7 @@ class Wallet : AppCompatActivity() {
     }
 
     private fun refreshBalance() {
-        val balance = TicketManager.getBalance(this)
+        val balance = TransportCardManager.getBalance(this)
         findViewById<TextView>(R.id.tvBalance).text = rand(balance)
     }
 
@@ -101,15 +101,15 @@ class Wallet : AppCompatActivity() {
         val tvEmpty = findViewById<TextView>(R.id.tvNoTransactions)
         container.removeAllViews()
 
-        val transactions = WalletTransactionStore.getAll(this).take(MAX_ROWS_SHOWN)
+        val transactions = PaymentStore.getAll(this).take(MAX_ROWS_SHOWN)
         tvEmpty.visibility = if (transactions.isEmpty()) View.VISIBLE else View.GONE
 
         val inflater = LayoutInflater.from(this)
         for (t in transactions) {
             val row = inflater.inflate(R.layout.item_transaction_row, container, false)
-            val isTopUp = t.type == WalletTransaction.TYPE_TOPUP
+            val isTopUp = t.type == Payment.TYPE_TOPUP
 
-            row.findViewById<TextView>(R.id.tvTxDate).text = dateFormat.format(Date(t.timestamp))
+            row.findViewById<TextView>(R.id.tvTxDate).text = dateFormat.format(Date(t.paymentDate))
             row.findViewById<TextView>(R.id.tvTxDescription).text = t.description
 
             val tvAmount = row.findViewById<TextView>(R.id.tvTxAmount)
@@ -156,10 +156,10 @@ class Wallet : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            TicketManager.topUp(this, amount)
+            TransportCardManager.topUp(this, amount)
             refreshBalance()
             loadTransactions()
-            NotificationHelper.notifyWalletTopUp(this, amount, TicketManager.getBalance(this))
+            NotificationHelper.notifyWalletTopUp(this, amount, TransportCardManager.getBalance(this))
 
             etAmount.text.clear()
             tvSuccess.text = "Wallet topped up successfully with ${rand(amount)}"

@@ -20,16 +20,25 @@ object NotificationHelper {
     fun notifyTicketPurchased(context: Context, ticket: Ticket, xpEarned: Int, newLevel: Int?) {
         val appContext = context.applicationContext
 
+        // Route/time details no longer live on the ticket -- resolve them via the join.
+        val details = TransportRouteRepository.scheduleDetails(ticket.scheduleId)
+        val routeText = if (details != null) {
+            "${details.originStop.stopName} \u2192 ${details.destinationStop.stopName}"
+        } else {
+            "your trip"
+        }
+
         val title = "Ticket purchased"
         val message = buildString {
-            append("Your ticket ${ticket.ticketId} for ${ticket.origin} \u2192 ${ticket.destination} is ready. ")
-            append("Departs ${ticket.departureTime} \u00b7 R${ticket.price} paid from your wallet.")
+            append("Your ticket ${ticket.ticketId} for $routeText is ready. ")
+            if (details != null) append("Departs ${details.schedule.departureTime} \u00b7 ")
+            append("R${ticket.price} paid from your wallet.")
             if (xpEarned > 0) append(" +$xpEarned XP.")
             if (newLevel != null) append(" Level up! You are now Level $newLevel.")
         }
 
         NotificationStore.add(appContext, title, message, AppNotification.TYPE_TICKET)
-        showSystemNotification(appContext, title, message, (ticket.purchaseTimestamp and 0x7FFFFFFF).toInt())
+        showSystemNotification(appContext, title, message, (ticket.purchaseDate and 0x7FFFFFFF).toInt())
     }
 
     fun notifyWalletTopUp(context: Context, amount: Int, newBalance: Int) {
