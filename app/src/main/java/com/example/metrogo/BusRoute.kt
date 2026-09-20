@@ -12,6 +12,6 @@ data class BusRoute (
     val arrivalTime : String,
     val price : Int,
     val registration : String,
-    val durationMinutes: Int = 0 // shown as "Duration" on the payment screen
+    val durationMinutes: Int = 0
 
 ):Serializable

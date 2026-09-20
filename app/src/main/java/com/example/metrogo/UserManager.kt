@@ -4,17 +4,13 @@ import android.content.Context
 import java.security.MessageDigest
 import java.util.UUID
 
-/**
- * MetroGO's local "user table". userId (a generated UUID) is the real primary key now;
- * email is a unique lookup index into it, not the key other tables reference. A small
- * "email -> userId" index is kept so login-by-email still works in O(1).
- */
+
 object UserManager {
 
     private const val PREFS_NAME = "metrogo_prefs"
     private const val KEY_SESSION_USER_ID = "session_user_id"
-    private const val USER_KEY_PREFIX = "user:"          // user:<userId> -> UserAccount json
-    private const val EMAIL_INDEX_PREFIX = "email_index:" // email_index:<email> -> userId
+    private const val USER_KEY_PREFIX = "user:"          // user:<userId>
+    private const val EMAIL_INDEX_PREFIX = "email_index:" // email_index:<email>
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -90,7 +86,7 @@ object UserManager {
         prefs(context).edit().remove(KEY_SESSION_USER_ID).apply()
     }
 
-    // ---------------- Session ----------------
+    // Session
 
     private fun setSession(context: Context, userId: String) {
         prefs(context).edit().putString(KEY_SESSION_USER_ID, userId).apply()
@@ -106,7 +102,7 @@ object UserManager {
         return getUserById(context, userId)
     }
 
-    // ---------------- Profile ----------------
+    // Profile
 
     fun updateProfile(
         context: Context,
@@ -144,7 +140,7 @@ object UserManager {
         logout(context)
     }
 
-    // ---------------- Storage ----------------
+    // Storage
 
     private fun findUserIdByEmail(context: Context, email: String): String? =
         prefs(context).getString(EMAIL_INDEX_PREFIX + normalize(email), null)

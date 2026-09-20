@@ -54,8 +54,7 @@ class NotificationPage : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh in case a notification arrived while this page was in the background.
-        if (::adapter.isInitialized) loadNotifications()
+          if (::adapter.isInitialized) loadNotifications()
     }
 
     private fun loadNotifications() {

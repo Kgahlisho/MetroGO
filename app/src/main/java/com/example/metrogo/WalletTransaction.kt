@@ -83,8 +83,7 @@ object WalletTransactionStore {
         }
     }
 
-    /** Wipes this specific user's transaction history. Called when their account is deleted. */
-    fun clearAllDataForUser(context: Context, email: String) {
+     fun clearAllDataForUser(context: Context, email: String) {
         prefs(context).edit().remove("$KEY_TRANSACTIONS:$email").apply()
     }
 }

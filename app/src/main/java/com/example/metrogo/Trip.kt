@@ -4,9 +4,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/** Presentation-layer wrapper for TravelHistory's list -- not a stored table itself.
- *  Ticket no longer carries route/time details directly, so this now resolves them via
- *  TransportRouteRepository.scheduleDetails(ticket.scheduleId) (the join). */
+
 data class Trip(
     val ticket: Ticket,
     val xpEarned: Int,

@@ -78,8 +78,7 @@ class TravelHistory : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Re-read the store so a ticket bought a moment ago shows up immediately.
-        if (::adapter.isInitialized) loadTrips()
+         if (::adapter.isInitialized) loadTrips()
     }
 
     /** Loads the real tickets the user has bought, then refreshes XP + the list. */
@@ -175,8 +174,8 @@ class TravelHistory : AppCompatActivity() {
         val filteredList = when (filter) {
             "Paid" -> allTrips.filter { it.isPaid }
             "Not Paid" -> allTrips.filter { !it.isPaid }
-            "Missed Boarding" -> emptyList() // not tracked for real tickets yet
-            else -> allTrips // "All Trips"
+            "Missed Boarding" -> emptyList()
+            else -> allTrips
         }
         adapter.updateList(filteredList)
         tvEmpty.visibility = if (filteredList.isEmpty()) View.VISIBLE else View.GONE

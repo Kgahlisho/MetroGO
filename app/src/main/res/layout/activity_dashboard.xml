@@ -9,7 +9,7 @@
     android:background="@color/app_background"
     tools:context=".Dashboard">
 
-    <!-- ============ TOP BAR ============ -->
+    <!-- TOP BAR -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -111,7 +111,7 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- ============ WELCOME CARD ============ -->
+            <!-- WELCOME CARD  -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/welcomeCard"
                 android:layout_width="match_parent"
@@ -147,7 +147,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- ============ BALANCE CARD ============ -->
+            <!-- BALANCE CARD  -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/balanceCard"
                 android:layout_width="match_parent"
@@ -219,7 +219,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- ============ BOARDING PASS CARD ============ -->
+            <!-- BOARDING PASS CARD  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -290,7 +290,7 @@
                     app:layout_constraintStart_toEndOf="@id/divider"
                     app:layout_constraintTop_toTopOf="@id/BoardingCode" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-            <!-- ============ QUICK ACTIONS ============ -->
+            <!-- QUICK ACTIONS  -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

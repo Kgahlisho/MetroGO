@@ -24,7 +24,6 @@ class PreferencesPage : AppCompatActivity() {
     private val textSizes = arrayOf("Small", "Medium", "Large")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // 1. ALWAYS call super.onCreate() first
         super.onCreate(savedInstanceState)
 
         // 2. Setup preferences
@@ -68,9 +67,7 @@ class PreferencesPage : AppCompatActivity() {
             finish()
         }
 
-        // App language -- translated on-device with Google's ML Kit Translation API
-        // (see LanguageManager). The choice is saved and applied to every screen.
-        val tvLanguageValue = findViewById<TextView>(R.id.tvLanguageValue)
+       val tvLanguageValue = findViewById<TextView>(R.id.tvLanguageValue)
         tvLanguageValue.text = LanguageManager.getSelected().nativeName
 
         val rowLanguage = findViewById<LinearLayout>(R.id.rowLanguage)
@@ -117,7 +114,6 @@ class PreferencesPage : AppCompatActivity() {
 
         val rowTextSize = findViewById<LinearLayout>(R.id.rowTextSize)
         rowTextSize.setOnClickListener {
-            // Read the saved value (not the label on screen, which may be translated).
             val current = textSizes.indexOf(prefs.getString("text_size", "Medium")).coerceAtLeast(0)
             AlertDialog.Builder(this)
                 .setTitle(LanguageManager.tr("Text Size"))
@@ -127,29 +123,22 @@ class PreferencesPage : AppCompatActivity() {
                     val selected = textSizes[which]
                     tvTextSizeValue.text = selected
                     prefs.edit().putString("text_size", selected).apply()
-                    // TODO: apply the chosen scale app-wide (e.g. via a custom font-scale wrapper)
-                    dialog.dismiss()
+                       dialog.dismiss()
                 }
                 .setNegativeButton(LanguageManager.tr("Cancel"), null)
                 .show()
         }
 
-        // 9. High Contrast Mode
-        val switchHighContrast = findViewById<Switch>(R.id.switchHighContrast)
+         val switchHighContrast = findViewById<Switch>(R.id.switchHighContrast)
         switchHighContrast.isChecked = prefs.getBoolean("high_contrast", false)
         switchHighContrast.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("high_contrast", isChecked).apply()
-            // TODO: apply a high-contrast color scheme once one is defined
-        }
+               }
 
 
     }
 
-    /**
-     * Downloads the language model if needed, then saves the choice and switches the app.
-     * The choice is only saved once the language is actually usable.
-     */
-    private fun changeLanguage(language: LanguageManager.Language, label: TextView) {
+      private fun changeLanguage(language: LanguageManager.Language, label: TextView) {
         if (language.code == LanguageManager.getSelected().code) return
 
         if (!language.isEnglish) {

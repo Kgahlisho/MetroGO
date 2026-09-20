@@ -1,15 +1,5 @@
 package com.example.metrogo
 
-/**
- * Single source of truth for available bus routes, used by both PurchaseTicket
- * (browse everything) and JourneyPlanner (filter by From/To).
- *
- * TODO: replace sampleRoutes with a real API/database call once one exists.
- * Keeping this in one place means every screen automatically stays in sync --
- * e.g. the station names JourneyPlanner lets you pick from are guaranteed to
- * actually match a route's origin/destination, instead of two hand-typed
- * lists silently drifting apart.
- */
 object BusRouteRepository {
 
     val sampleRoutes: List<BusRoute> = listOf(
@@ -27,8 +17,7 @@ object BusRouteRepository {
         BusRoute(12, "T2 Vea Raya", "Soweto", "Parktown", "19:36", "20:09", 63, "GP 374-825", 33)
     )
 
-    /** Every station that appears as an origin or destination, alphabetised, no duplicates. */
-    val stationNames: List<String> by lazy {
+     val stationNames: List<String> by lazy {
         (sampleRoutes.map { it.origin } + sampleRoutes.map { it.destination })
             .distinct()
             .sorted()

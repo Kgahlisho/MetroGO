@@ -8,7 +8,7 @@
     android:background="@color/app_background"
     tools:context=".PaymentActivity">
 
-    <!-- ============ TOP BAR ============ -->
+    <!-- TOP BAR  -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -72,7 +72,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ============ SCROLLABLE CONTENT ============ -->
+    <!--  SCROLLABLE CONTENT -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollContent"
         android:layout_width="0dp"
@@ -445,7 +445,7 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- ============ STICKY FOOTER ============ -->
+    <!-- STICKY FOOTER -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/footerBar"
         android:layout_width="0dp"

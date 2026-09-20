@@ -5,14 +5,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 
-/** Replaces WalletTransactionStore. Same idea, keyed by the real userId FK, and now
- *  records the ticketId a purchase paid for instead of only a free-text description. */
 object PaymentStore {
 
     private const val PREFS_NAME = "metrogo_prefs"
     private const val KEY_PAYMENTS_PREFIX = "payments:" // payments:<userId>
     private const val MAX_STORED = 100
-
     const val TYPE_TOPUP = Payment.TYPE_TOPUP
     const val TYPE_PURCHASE = Payment.TYPE_PURCHASE
 
@@ -86,14 +83,12 @@ object PaymentStore {
         }
     }
 
-    /** Convenience overload for callers that already have the current session's userId. */
     fun getAll(context: Context): List<Payment> {
         val userId = UserManager.getCurrentUserId(context) ?: return emptyList()
         return getAll(context, userId)
     }
 
-    /** Wipes this specific user's payment history. Called when their account is deleted. */
-    fun clearAllDataForUser(context: Context, userId: String) {
+     fun clearAllDataForUser(context: Context, userId: String) {
         prefs(context).edit().remove(KEY_PAYMENTS_PREFIX + userId).apply()
     }
 }

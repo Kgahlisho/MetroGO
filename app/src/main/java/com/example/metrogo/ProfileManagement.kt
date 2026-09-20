@@ -71,17 +71,14 @@ class ProfileManagement : AppCompatActivity() {
         etDob.setText(currentUser.dob)
         etMobile.setText(currentUser.mobile)
         etEmail.setText(currentUser.email)
-        etEmail.isEnabled = false // email is the account identifier -- not editable here
-
-        // Snapshot of the values loaded from the profile, used to restore on Cancel
-        val originalFullName = etFullName.text.toString()
+        etEmail.isEnabled = false
+          val originalFullName = etFullName.text.toString()
         val originalIdNumber = etIdNumber.text.toString()
         val originalDob = etDob.text.toString()
         val originalMobile = etMobile.text.toString()
         val originalEmail = etEmail.text.toString()
 
-        // Date of Birth opens a date picker instead of the keyboard
-        etDob.setOnClickListener {
+           etDob.setOnClickListener {
             val calendar = Calendar.getInstance()
             DatePickerDialog(
                 this,
@@ -99,9 +96,7 @@ class ProfileManagement : AppCompatActivity() {
             if (etFullName.text.isBlank() || etMobile.text.isBlank() || etEmail.text.isBlank()) {
                 Toast.makeText(this, "Full name, mobile number and email are required", Toast.LENGTH_SHORT).show()
             } else {
-                // The screen still has one "full name" box; the table stores firstName and
-                // surname separately, so split on the first space (rest of the text = surname).
-                val nameParts = etFullName.text.toString().trim().split(Regex("\\s+"), limit = 2)
+                   val nameParts = etFullName.text.toString().trim().split(Regex("\\s+"), limit = 2)
                 val saved = UserManager.updateProfile(
                     this,
                     firstName = nameParts[0],
@@ -128,7 +123,6 @@ class ProfileManagement : AppCompatActivity() {
             Toast.makeText(this, "Changes discarded", Toast.LENGTH_SHORT).show()
         }
 
-        // Delete Account: destructive action, always confirm first
         val btnDeleteAccount = findViewById<Button>(R.id.btnDeleteAccount)
         btnDeleteAccount.setOnClickListener {
             AlertDialog.Builder(this)

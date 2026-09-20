@@ -28,7 +28,6 @@ class Dashboard : AppCompatActivity() {
     private val currencyFormat = DecimalFormat("#,##0.00")
 
     companion object {
-        /** The balance (in rand) at which the credit progress bar shows as full. */
         private const val CREDIT_BAR_MAX = 5000
     }
 
@@ -126,7 +125,6 @@ class Dashboard : AppCompatActivity() {
             "$percent% of R${DecimalFormat("#,##0").format(CREDIT_BAR_MAX)}"
     }
 
-    /** Professional wallet overview: credits, last purchase, last top-up and XP level. */
     private fun showBalanceDetailsDialog() {
         val dialog = Dialog(this)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -138,7 +136,7 @@ class Dashboard : AppCompatActivity() {
             startActivity(Intent(this, Wallet::class.java))
         }
 
-        // ---- Header: available credits + progress ----
+        // Header: available credits + progress
         val balance = TransportCardManager.getBalance(this)
         val percent = ((balance.toLong() * 100) / CREDIT_BAR_MAX).toInt().coerceIn(0, 100)
         dialog.findViewById<TextView>(R.id.tvDialogBalance).text = "R${currencyFormat.format(balance)}"
@@ -146,7 +144,7 @@ class Dashboard : AppCompatActivity() {
         dialog.findViewById<TextView>(R.id.tvDialogCreditCaption).text =
             "$percent% of R${DecimalFormat("#,##0").format(CREDIT_BAR_MAX)}"
 
-        // ---- Body ----
+        //  Body
         val dateFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
         val container = dialog.findViewById<LinearLayout>(R.id.layoutBalanceRows)
         val inflater = LayoutInflater.from(this)
@@ -200,7 +198,7 @@ class Dashboard : AppCompatActivity() {
             addRow(R.drawable.ic_wallet, "LAST CREDIT TOP-UP", "No top-ups yet", "Top up your wallet to see it here")
         }
 
-        // Experience level.
+        // Exp  level. The level increases/changes to the next level when it reaches 100
         val xp = TicketStore.getXpProgress(this)
         val toNext = TicketStore.XP_PER_LEVEL - xp.xpInLevel
         addRow(
@@ -226,7 +224,6 @@ class Dashboard : AppCompatActivity() {
         val tapToEnlargeLabel = findViewById<TextView>(R.id.tvTapToEnlarge)
 
         val ticket = TicketStore.getActiveTicket(this)
-        // Route/stop/time details are resolved through the Schedule -> Route -> BusStop join.
         val details = ticket?.let { TransportRouteRepository.scheduleDetails(it.scheduleId) }
         if (ticket == null || details == null) {
             qrImageView.setImageDrawable(null)
@@ -247,8 +244,6 @@ class Dashboard : AppCompatActivity() {
                 "${details.originStop.stopName} \u2192 ${details.destinationStop.stopName}\n" +
                 "Departs ${details.schedule.departureTime} \u2022 Bus ${details.schedule.busRegistration}"
 
-        // Cache the current QR + caption so the enlarged dialog shows exactly
-        // what's on the dashboard, and wire up the tap-to-enlarge affordance.
         currentQrBitmap = qrBitmap
         currentBoardingStatus = statusText.text.toString()
         tapToEnlargeLabel.visibility = android.view.View.VISIBLE
@@ -257,8 +252,7 @@ class Dashboard : AppCompatActivity() {
         tapToEnlargeLabel.setOnClickListener { openEnlargedQr() }
     }
 
-    /** Shows the boarding pass QR code full-screen-ish, for easier scanning. */
-    private fun showEnlargedQrDialog() {
+   private fun showEnlargedQrDialog() {
         val bitmap = currentQrBitmap ?: return
 
         val dialog = Dialog(this)

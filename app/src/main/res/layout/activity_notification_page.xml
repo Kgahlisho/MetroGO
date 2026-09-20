@@ -8,7 +8,7 @@
     android:background="@color/app_background"
     tools:context=".NotificationPage">
 
-    <!-- ============ TOP BAR ============ -->
+    <!--  TOP BAR  -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"
@@ -110,7 +110,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ============ CONTENT ============ -->
+    <!--  CONTENT  -->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvNotifications"

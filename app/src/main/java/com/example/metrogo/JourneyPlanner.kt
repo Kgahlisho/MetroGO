@@ -25,7 +25,6 @@ class JourneyPlanner : AppCompatActivity() {
     private lateinit var btnSwap: ImageButton
     private lateinit var btnFindRoutes: Button
     private lateinit var btnBack: ImageButton
-
     private lateinit var tvMatchingSubtitle: TextView
     private lateinit var tvNoMatches: TextView
     private lateinit var rvMatchingBuses: RecyclerView
@@ -64,8 +63,6 @@ class JourneyPlanner : AppCompatActivity() {
         setupClickListeners()
         setupBusLists()
 
-        // Show results for the default From/To straight away, rather than waiting
-        // for the user to tap "Find Routes" first.
         findRoutes()
     }
 
@@ -109,14 +106,11 @@ class JourneyPlanner : AppCompatActivity() {
     private fun setupBusLists() {
         rvMatchingBuses.layoutManager = LinearLayoutManager(this)
         rvOtherBuses.layoutManager = LinearLayoutManager(this)
-        // Both lists live inside the screen's outer NestedScrollView, so let it own scrolling.
         rvMatchingBuses.isNestedScrollingEnabled = false
         rvOtherBuses.isNestedScrollingEnabled = false
     }
 
     private fun showStationSelectionDialog(type: String) {
-        // Pulled from the BusStop table, so every station shown here is guaranteed to
-        // match a real route's origin/destination stop.
         val stations = TransportRouteRepository.stationNames.toTypedArray()
 
         androidx.appcompat.app.AlertDialog.Builder(this)
@@ -128,7 +122,7 @@ class JourneyPlanner : AppCompatActivity() {
                 } else {
                     tvToStation.text = selectedStation
                 }
-                // Re-run the search immediately so results always reflect what's on screen.
+
                 findRoutes()
             }
             .setNegativeButton("Cancel", null)

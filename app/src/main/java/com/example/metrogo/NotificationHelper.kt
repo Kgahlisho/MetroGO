@@ -20,8 +20,7 @@ object NotificationHelper {
     fun notifyTicketPurchased(context: Context, ticket: Ticket, xpEarned: Int, newLevel: Int?) {
         val appContext = context.applicationContext
 
-        // Route/time details no longer live on the ticket -- resolve them via the join.
-        val details = TransportRouteRepository.scheduleDetails(ticket.scheduleId)
+          val details = TransportRouteRepository.scheduleDetails(ticket.scheduleId)
         val routeText = if (details != null) {
             "${details.originStop.stopName} \u2192 ${details.destinationStop.stopName}"
         } else {
@@ -80,7 +79,7 @@ object NotificationHelper {
         try {
             NotificationManagerCompat.from(context).notify(id, notification)
         } catch (e: SecurityException) {
-            // permission was revoked between the check and the call; nothing else to do
+
         }
     }
 

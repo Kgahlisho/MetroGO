@@ -6,7 +6,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-/** Lists departures. Each row is one Schedule joined with its TransportRoute and both BusStops. */
 class BusRouteAdapter(
     private val schedules: List<TransportRouteRepository.ScheduleDetails>,
     private val onSelect: (TransportRouteRepository.ScheduleDetails) -> Unit

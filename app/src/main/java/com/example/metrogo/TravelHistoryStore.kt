@@ -7,13 +7,11 @@ import java.util.UUID
 object TravelHistoryStore {
 
     private const val PREFS_NAME = "metrogo_prefs"
-    private const val KEY_TRAVEL_HISTORY_PREFIX = "travel_history:" // travel_history:<userId>
-
+    private const val KEY_TRAVEL_HISTORY_PREFIX = "travel_history:"
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    /** Call once per successful purchase, alongside TicketStore.addToHistory(). */
-    fun add(context: Context, ticket: Ticket) {
+   fun add(context: Context, ticket: Ticket) {
         val entry = TravelHistoryEntry(
             travelId = UUID.randomUUID().toString(),
             userId = ticket.userId,
@@ -45,8 +43,7 @@ object TravelHistoryStore {
         return try { JSONArray(json) } catch (e: Exception) { JSONArray() }
     }
 
-    /** Wipes this specific user's travel history. Called when their account is deleted. */
-    fun clearAllDataForUser(context: Context, userId: String) {
+     fun clearAllDataForUser(context: Context, userId: String) {
         prefs(context).edit().remove(KEY_TRAVEL_HISTORY_PREFIX + userId).apply()
     }
 }

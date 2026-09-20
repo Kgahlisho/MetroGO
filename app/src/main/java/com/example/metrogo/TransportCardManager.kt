@@ -3,13 +3,11 @@ package com.example.metrogo
 import android.content.Context
 import java.util.UUID
 
-/** Replaces the wallet-balance portion of the old TicketManager. Every function takes
- *  the current user's real userId (a proper FK) instead of namespacing SharedPreferences
- *  keys with an email string by hand. */
+
 object TransportCardManager {
 
     private const val PREFS_NAME = "metrogo_prefs"
-    private const val KEY_CARD_PREFIX = "transport_card:" // transport_card:<userId> -> TransportCard json
+    private const val KEY_CARD_PREFIX = "transport_card:"
     private const val DEFAULT_BALANCE = 0
 
     private fun prefs(context: Context) =
@@ -47,8 +45,7 @@ object TransportCardManager {
         return getOrCreateCard(context, userId).balance
     }
 
-    /** Returns true if the balance was sufficient and the deduction succeeded. */
-    fun deduct(context: Context, amount: Int, description: String = "Ticket purchase", ticketId: String? = null): Boolean {
+      fun deduct(context: Context, amount: Int, description: String = "Ticket purchase", ticketId: String? = null): Boolean {
         val userId = UserManager.getCurrentUserId(context) ?: return false
         val card = getOrCreateCard(context, userId)
         if (card.balance < amount) return false
@@ -67,8 +64,7 @@ object TransportCardManager {
         PaymentStore.add(context, userId, PaymentStore.TYPE_TOPUP, "Wallet top-up", amount, ticketId = null)
     }
 
-    /** Wipes this specific user's card. Called when their account is deleted. */
-    fun clearAllDataForUser(context: Context, userId: String) {
+      fun clearAllDataForUser(context: Context, userId: String) {
         prefs(context).edit().remove(KEY_CARD_PREFIX + userId).apply()
     }
 }

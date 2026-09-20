@@ -1,14 +1,6 @@
 package com.example.metrogo
 
-/**
- * Replaces BusRouteRepository. Sample reference data, now properly split across three
- * normalized tables (BusStop, TransportRoute, Schedule) instead of one flat table that
- * repeated routeName/origin/destination on every timed departure.
- *
- * Also provides join-style helper functions (ScheduleDetails) so screens like
- * JourneyPlanner/PurchaseTicket can still get one denormalized "here's everything about
- * this departure" object for display, without every screen re-implementing the join.
- */
+
 object TransportRouteRepository {
 
     val busStops: List<BusStop> = listOf(
@@ -46,9 +38,7 @@ object TransportRouteRepository {
         Schedule("sched-12", "route-6", "13:27", "14:08", 26, "GP 903-417", 41)
     )
 
-    /** A denormalized, display-ready bundle of one schedule + its route + both stops --
-     *  the join, done once here, instead of every screen resolving FKs by hand. */
-    data class ScheduleDetails(
+      data class ScheduleDetails(
         val schedule: Schedule,
         val route: TransportRoute,
         val originStop: BusStop,
@@ -62,8 +52,7 @@ object TransportRouteRepository {
     fun stopIdByName(stopName: String): String? =
         busStops.find { it.stopName.equals(stopName, ignoreCase = true) }?.stopId
 
-    /** Every stop name a station picker can offer -- guaranteed to match a real stop. */
-    val stationNames: List<String> by lazy { busStops.map { it.stopName }.sorted() }
+     val stationNames: List<String> by lazy { busStops.map { it.stopName }.sorted() }
 
     fun scheduleDetails(scheduleId: String): ScheduleDetails? {
         val schedule = getSchedule(scheduleId) ?: return null

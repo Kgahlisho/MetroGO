@@ -2,10 +2,7 @@ package com.example.metrogo
 
 import org.json.JSONObject
 
-/** The wallet, properly modeled as its own entity instead of a bare Int floating in
- *  TicketManager. One user could in principle have more than one card later (e.g. a
- *  physical tap card alongside the in-app balance) -- cardId is independent of userId
- *  for exactly that reason, even though today each user only ever has one. */
+
 data class TransportCard(
     val cardId: String,
     val userId: String, // FK -> UserAccount

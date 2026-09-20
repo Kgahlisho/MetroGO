@@ -5,11 +5,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 
-/** notificationId PK, userId FK now present (was previously implicit in a SharedPreferences
- *  key), and isRead added -- the app had no read/unread concept at all before this. */
 data class AppNotification(
     val id: String,
-    val userId: String, // FK -> UserAccount
+    val userId: String, // FK
     val title: String,
     val message: String,
     val timestamp: Long,
@@ -26,7 +24,7 @@ data class AppNotification(
 object NotificationStore {
 
     private const val PREFS_NAME = "metrogo_prefs"
-    private const val KEY_NOTIFICATIONS_PREFIX = "notifications:" // notifications:<userId>
+    private const val KEY_NOTIFICATIONS_PREFIX = "notifications:"
     private const val MAX_STORED = 100
 
     private fun prefs(context: Context) =

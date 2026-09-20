@@ -51,8 +51,7 @@ class TripAdapter(
 
     override fun getItemCount() = tripList.size
 
-    // Method to update the list when filtering
-    fun updateList(newList: List<Trip>) {
+     fun updateList(newList: List<Trip>) {
         tripList = newList
         notifyDataSetChanged()
     }

@@ -103,10 +103,7 @@ class PaymentActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvDestinationTime).text = "Arrives ${schedule.arrivalTime}"
         findViewById<TextView>(R.id.tvDuration).text = "${schedule.durationMinutes} min"
         findViewById<TextView>(R.id.tvRegistration).text = schedule.busRegistration
-
-        // Service fee is a flat R0.00 for now (static in the layout) -- fare is the only
-        // line item, so both totals just mirror the fare price.
-        findViewById<TextView>(R.id.tvTotalAmount).text = rand(schedule.price)
+    findViewById<TextView>(R.id.tvTotalAmount).text = rand(schedule.price)
         findViewById<TextView>(R.id.tvTotalInline).text = rand(schedule.price)
     }
 

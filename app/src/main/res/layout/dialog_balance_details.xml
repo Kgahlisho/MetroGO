@@ -11,7 +11,7 @@
         android:background="@drawable/bg_card_white"
         android:orientation="vertical">
 
-        <!-- ============ HEADER: available credits ============ -->
+        <!--  HEADER: available credits  -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                 app:layout_constraintTop_toBottomOf="@id/pbDialogCredit" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!-- ============ BODY: last purchase / last top-up / level ============ -->
+        <!-- BODY: last purchase -->
         <LinearLayout
             android:id="@+id/layoutBalanceRows"
             android:layout_width="match_parent"
@@ -100,7 +100,7 @@
             android:paddingHorizontal="20dp"
             android:paddingTop="6dp" />
 
-        <!-- ============ FOOTER ============ -->
+        <!-- FOOTER  -->
         <TextView
             android:id="@+id/btnDialogTopUp"
             android:layout_width="match_parent"

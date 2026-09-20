@@ -6,7 +6,7 @@ data class TransportRoute(
 
     val routeId: String,
     val routeName: String,
-    val originStopId: String,      // FK -> BusStop
-    val destinationStopId: String, // FK -> BusStop
+    val originStopId: String,
+    val destinationStopId: String,
     val status: String = "active"
 ) : Serializable

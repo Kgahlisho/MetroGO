@@ -45,8 +45,7 @@ class Wallet : AppCompatActivity() {
             insets
         }
 
-        // Android 13+ needs the user's permission before we can show system notifications.
-        if (Build.VERSION.SDK_INT >= 33 &&
+       if (Build.VERSION.SDK_INT >= 33 &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
             != PackageManager.PERMISSION_GRANTED
         ) {

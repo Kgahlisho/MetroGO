@@ -41,7 +41,6 @@ object LanguageManager {
         Language("Swahili", "Kiswahili", TranslateLanguage.SWAHILI)
     )
 
-    /** Views with these ids are never translated (user data, or text the app reads back). */
     private val SKIP_IDS = setOf(
         "tvWelcomeName", "tvLanguageValue", "tvFromStation", "tvToStation",
         "tvMatchingSubtitle", "tvFareHold"
@@ -74,7 +73,6 @@ object LanguageManager {
     private val handler = Handler(Looper.getMainLooper())
     private var currentActivity: WeakReference<Activity>? = null
     private val dialogs = mutableListOf<WeakReference<Dialog>>()
-
     private val translators = HashMap<String, Translator>()
     private val readyModels = HashSet<String>()
     private val downloadWaiters = HashMap<String, MutableList<(Boolean) -> Unit>>()
@@ -132,10 +130,8 @@ object LanguageManager {
         prefs().edit().putString(KEY_LANGUAGE, language.name).apply()
     }
 
-    /** Call after setSelected() so the open screen switches language straight away. */
-    fun onLanguageChanged() = schedulePass(0)
+     fun onLanguageChanged() = schedulePass(0)
 
-    /** Returns the cached translation of [text] in the chosen language, or [text] itself. */
     fun tr(text: String): String {
         val language = getSelected()
         if (language.isEnglish) return text
@@ -243,11 +239,10 @@ object LanguageManager {
             return
         }
 
-        val resolved = resolve(language, original, missing) ?: return // still being translated
+        val resolved = resolve(language, original, missing) ?: return
 
         if (resolved == original) {
-            // Nothing to translate in this text (numbers, names...).
-            if (current != original) slot.set(v, original)
+             if (current != original) slot.set(v, original)
             v.setTag(slot.originalTag, null)
             v.setTag(slot.translatedTag, null)
             return
@@ -284,7 +279,7 @@ object LanguageManager {
         if (text in NEVER_TRANSLATE) return false
         if (text.length > 500) return false
         if (text.count { it.isLetter() } < 2) return false // "R 100.00", "%"
-        if (text.contains('@')) return false                // emails
+        if (text.contains('@')) return false        // email
         if (text.none { it.isWhitespace() } && text.any { it.isDigit() }) return false // ids, times
         return true
     }

@@ -9,13 +9,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 
-/** Replaces the ticket/XP portion of the old TicketManager. Same XP rules as before,
- *  just keyed by the real userId FK instead of an email string. */
 object TicketStore {
 
     private const val PREFS_NAME = "metrogo_prefs"
-    private const val KEY_ACTIVE_TICKET_PREFIX = "active_ticket:"   // active_ticket:<userId>
-    private const val KEY_TICKET_HISTORY_PREFIX = "ticket_history:" // ticket_history:<userId>
+    private const val KEY_ACTIVE_TICKET_PREFIX = "active_ticket:"
+    private const val KEY_TICKET_HISTORY_PREFIX = "ticket_history:"
 
     const val XP_MIN_TICKET_PRICE = 25
     const val XP_PER_TICKET = 5
@@ -37,8 +35,6 @@ object TicketStore {
         else -> 0
     }
 
-    // ---------------- Active ticket ----------------
-
     fun saveActiveTicket(context: Context, ticket: Ticket) {
         prefs(context).edit().putString(KEY_ACTIVE_TICKET_PREFIX + ticket.userId, ticket.toJson()).apply()
     }
@@ -58,11 +54,9 @@ object TicketStore {
         prefs(context).edit().remove(KEY_ACTIVE_TICKET_PREFIX + userId).apply()
     }
 
-    // ---------------- Ticket history / XP ----------------
+    // Ticket history / XP
 
-    /** Call once per successful purchase. Returns the XP that ticket earned. Also writes
-     *  a matching TravelHistory row -- see TravelHistoryStore. */
-    fun addToHistory(context: Context, ticket: Ticket): Int {
+     fun addToHistory(context: Context, ticket: Ticket): Int {
         val xp = xpForPrice(ticket.price)
         val array = readHistoryArray(context, ticket.userId)
         val entry = JSONObject()
@@ -73,7 +67,6 @@ object TicketStore {
         return xp
     }
 
-    /** Real purchased tickets, newest first. */
     fun getTripHistory(context: Context): List<Trip> {
         val userId = UserManager.getCurrentUserId(context) ?: return emptyList()
         val array = readHistoryArray(context, userId)
@@ -84,8 +77,7 @@ object TicketStore {
                 val ticket = Ticket.fromJson(entry.getJSONObject("ticket").toString())
                 trips.add(Trip(ticket, entry.optInt("xp", xpForPrice(ticket.price))))
             } catch (e: Exception) {
-                // skip a corrupt entry rather than crash the history screen
-            }
+              }
         }
         return trips.sortedByDescending { it.ticket.purchaseDate }
     }
@@ -106,7 +98,6 @@ object TicketStore {
         return try { JSONArray(json) } catch (e: Exception) { JSONArray() }
     }
 
-    /** Wipes this specific user's active ticket + history. Called on account deletion. */
     fun clearAllDataForUser(context: Context, userId: String) {
         prefs(context).edit()
             .remove(KEY_ACTIVE_TICKET_PREFIX + userId)
