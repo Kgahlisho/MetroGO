@@ -40,15 +40,19 @@ class LoginPage : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            when (val result = UserManager.login(this, email, password)) {
-                is UserManager.AuthResult.Success -> {
-                    val intent = Intent(this, Dashboard::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    finish()
-                }
-                is UserManager.AuthResult.Failure -> {
-                    Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+            loginToDash.isEnabled = false   // prevent double taps while the request runs
+            UserManager.login(this, email, password) { result ->
+                when (result) {
+                    is UserManager.AuthResult.Success -> {
+                        val intent = Intent(this, Dashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    }
+                    is UserManager.AuthResult.Failure -> {
+                        loginToDash.isEnabled = true
+                        Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

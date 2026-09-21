@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "401243269536",
+    "project_id": "metrogo-2470f",
+    "storage_bucket": "metrogo-2470f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:401243269536:android:42f917ec9d7cfd1187dcc5",
+        "android_client_info": {
+          "package_name": "com.example.metrogo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_mOdsc8EhqrxD9WiR8EDYCbzu0A0RzF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

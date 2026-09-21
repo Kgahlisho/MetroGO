@@ -59,16 +59,20 @@ class RegisterPage : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            when (val result = UserManager.register(this, email, password, firstName, surname, mobile)) {
-                is UserManager.AuthResult.Success -> {
-                    Toast.makeText(this, "Welcome to MetroGO, ${result.user.fullName}!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this, Dashboard::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    finish()
-                }
-                is UserManager.AuthResult.Failure -> {
-                    Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+            signUpThree.isEnabled = false   // prevent double taps while the request runs
+            UserManager.register(this, email, password, firstName, surname, mobile) { result ->
+                when (result) {
+                    is UserManager.AuthResult.Success -> {
+                        Toast.makeText(this, "Welcome to MetroGO, ${result.user.fullName}!", Toast.LENGTH_SHORT).show()
+                        val intent = Intent(this, Dashboard::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    }
+                    is UserManager.AuthResult.Failure -> {
+                        signUpThree.isEnabled = true
+                        Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

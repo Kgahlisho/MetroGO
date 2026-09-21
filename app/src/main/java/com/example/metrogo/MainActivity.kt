@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (UserManager.isLoggedIn(this)) {
+            UserManager.syncProfile(this)   // refresh the local profile cache in the background
             val intent = Intent(this, Dashboard::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)

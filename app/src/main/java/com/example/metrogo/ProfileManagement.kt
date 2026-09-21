@@ -39,8 +39,8 @@ class ProfileManagement : AppCompatActivity() {
         }
 
         val circleNotification = findViewById<FrameLayout>(R.id.circleNotification)
-        circleNotification.setOnClickListener{
-            val intent = Intent(this , NotificationPage::class.java)
+        circleNotification.setOnClickListener {
+            val intent = Intent(this, NotificationPage::class.java)
             startActivity(intent)
         }
 
@@ -72,13 +72,13 @@ class ProfileManagement : AppCompatActivity() {
         etMobile.setText(currentUser.mobile)
         etEmail.setText(currentUser.email)
         etEmail.isEnabled = false
-          val originalFullName = etFullName.text.toString()
+        val originalFullName = etFullName.text.toString()
         val originalIdNumber = etIdNumber.text.toString()
         val originalDob = etDob.text.toString()
         val originalMobile = etMobile.text.toString()
         val originalEmail = etEmail.text.toString()
 
-           etDob.setOnClickListener {
+        etDob.setOnClickListener {
             val calendar = Calendar.getInstance()
             DatePickerDialog(
                 this,
@@ -96,7 +96,7 @@ class ProfileManagement : AppCompatActivity() {
             if (etFullName.text.isBlank() || etMobile.text.isBlank() || etEmail.text.isBlank()) {
                 Toast.makeText(this, "Full name, mobile number and email are required", Toast.LENGTH_SHORT).show()
             } else {
-                   val nameParts = etFullName.text.toString().trim().split(Regex("\\s+"), limit = 2)
+                val nameParts = etFullName.text.toString().trim().split(Regex("\\s+"), limit = 2)
                 val saved = UserManager.updateProfile(
                     this,
                     firstName = nameParts[0],
@@ -129,15 +129,21 @@ class ProfileManagement : AppCompatActivity() {
                 .setTitle("Delete Account")
                 .setMessage("This will permanently delete your MetroGO account. This action cannot be undone.")
                 .setPositiveButton("Delete") { _, _ ->
-                    UserManager.deleteAccount(this)
-                    val loginIntent = Intent(this, LoginPage::class.java)
-                    loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(loginIntent)
-                    finish()
+                    btnDeleteAccount.isEnabled = false
+                    UserManager.deleteAccount(this) { success, message ->
+                        if (success) {
+                            val loginIntent = Intent(this, LoginPage::class.java)
+                            loginIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            startActivity(loginIntent)
+                            finish()
+                        } else {
+                            btnDeleteAccount.isEnabled = true
+                            Toast.makeText(this, message ?: "Couldn't delete your account.", Toast.LENGTH_LONG).show()
+                        }
+                    }
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-
     }
 }
