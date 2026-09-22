@@ -9,10 +9,7 @@ MetroGO started as a UI prototype for a South African minibus/bus transit servic
 - [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Data Model](#data-model)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Firebase Integration Status](#firebase-integration-status)
-- [Roadmap](#roadmap)
+- [Firebase](#Firebase-integration-status)
 - [Known Limitations](#known-limitations)
 
 ---
@@ -107,6 +104,9 @@ The local data model is deliberately normalized to **Third Normal Form**, design
 
 A few fields (ticket price, payment amount, travel-history fare) are deliberately *not* fully normalized away — they're point-in-time snapshots of what was actually paid, which is standard invoicing practice, not an oversight.
 
+## Firebase integration status 
+
+Status : Configuration completed , and all the information displays once the user is registered and the appropriate tables have been created according to the applications design schema 
 
 
 ## Known Limitations
