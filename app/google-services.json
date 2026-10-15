@@ -12,7 +12,20 @@
           "package_name": "com.example.metrogo"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "401243269536-2mbjppp5hpmhho35clp4lbuitukok2q7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.metrogo",
+            "certificate_hash": "09891851caa60c9e22ffe02086e899fbe232b55c"
+          }
+        },
+        {
+          "client_id": "401243269536-g660k24pkcrnduh0tp5jv1p7g43kcn5e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyB_mOdsc8EhqrxD9WiR8EDYCbzu0A0RzF4"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "401243269536-g660k24pkcrnduh0tp5jv1p7g43kcn5e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

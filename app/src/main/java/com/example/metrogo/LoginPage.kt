@@ -31,6 +31,8 @@ class LoginPage : AppCompatActivity() {
         val etPassword = findViewById<EditText>(R.id.etLoginPassword)
 
         val loginToDash = findViewById<Button>(R.id.LoginToDash)
+        val btnGoogle = findViewById<Button>(R.id.btnGoogleLogin)
+
         loginToDash.setOnClickListener {
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString()
@@ -43,15 +45,27 @@ class LoginPage : AppCompatActivity() {
             loginToDash.isEnabled = false   // prevent double taps while the request runs
             UserManager.login(this, email, password) { result ->
                 when (result) {
-                    is UserManager.AuthResult.Success -> {
-                        val intent = Intent(this, Dashboard::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-                    }
+                    is UserManager.AuthResult.Success -> goToDashboard()
                     is UserManager.AuthResult.Failure -> {
                         loginToDash.isEnabled = true
                         Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        btnGoogle.setOnClickListener {
+            btnGoogle.isEnabled = false
+            loginToDash.isEnabled = false
+            GoogleSignInHelper.signIn(this) { result ->
+                when (result) {
+                    is UserManager.AuthResult.Success -> goToDashboard()
+                    is UserManager.AuthResult.Failure -> {
+                        btnGoogle.isEnabled = true
+                        loginToDash.isEnabled = true
+                        if (result.message.isNotBlank()) {
+                            Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
@@ -61,5 +75,12 @@ class LoginPage : AppCompatActivity() {
         signUpTwo.setOnClickListener {
             startActivity(Intent(this, RegisterPage::class.java))
         }
+    }
+
+    private fun goToDashboard() {
+        val intent = Intent(this, Dashboard::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

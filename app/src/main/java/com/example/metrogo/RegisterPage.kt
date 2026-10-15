@@ -40,6 +40,8 @@ class RegisterPage : AppCompatActivity() {
         }
 
         val signUpThree = findViewById<Button>(R.id.SignUpThree)
+        val btnGoogle = findViewById<Button>(R.id.btnGoogleSignUp)
+
         signUpThree.setOnClickListener {
             val firstName = etFirstName.text.toString().trim()
             val surname = etSurname.text.toString().trim()
@@ -64,10 +66,7 @@ class RegisterPage : AppCompatActivity() {
                 when (result) {
                     is UserManager.AuthResult.Success -> {
                         Toast.makeText(this, "Welcome to MetroGO, ${result.user.fullName}!", Toast.LENGTH_SHORT).show()
-                        val intent = Intent(this, Dashboard::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
+                        goToDashboard()
                     }
                     is UserManager.AuthResult.Failure -> {
                         signUpThree.isEnabled = true
@@ -76,5 +75,32 @@ class RegisterPage : AppCompatActivity() {
                 }
             }
         }
+
+        btnGoogle.setOnClickListener {
+            btnGoogle.isEnabled = false
+            signUpThree.isEnabled = false
+            GoogleSignInHelper.signIn(this) { result ->
+                when (result) {
+                    is UserManager.AuthResult.Success -> {
+                        Toast.makeText(this, "Welcome to MetroGO, ${result.user.fullName}!", Toast.LENGTH_SHORT).show()
+                        goToDashboard()
+                    }
+                    is UserManager.AuthResult.Failure -> {
+                        btnGoogle.isEnabled = true
+                        signUpThree.isEnabled = true
+                        if (result.message.isNotBlank()) {
+                            Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun goToDashboard() {
+        val intent = Intent(this, Dashboard::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

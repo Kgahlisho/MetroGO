@@ -2,6 +2,8 @@ package com.example.metrogo
 
 import android.content.Context
 import android.util.Log
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.CredentialManager
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -9,15 +11,19 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * Accounts are handled by Firebase Auth; the profile lives in Firestore at users/{uid}
  * and is mirrored in a small local cache so getCurrentUser() can stay synchronous.
  *
- * register/login/deleteAccount are asynchronous and report back through a callback
- * (always invoked on the main thread).
+ * register/login/signInWithGoogle/deleteAccount are asynchronous and report back through
+ * a callback (always invoked on the main thread).
  */
 object UserManager {
 
@@ -123,10 +129,86 @@ object UserManager {
             .addOnFailureListener { e -> onResult(AuthResult.Failure(describe(e))) }
     }
 
+    // ---------------- Google sign-in ----------------
+
+    /**
+     * Signs into Firebase with a Google ID token (from GoogleSignInHelper). Works for both
+     * "log in" and "sign up": if no profile exists at users/{uid} yet, one is created from the
+     * Google account's name and email. An existing profile is never overwritten.
+     * Mobile number stays empty until the user adds it on the profile page.
+     */
+    fun signInWithGoogle(
+        context: Context,
+        idToken: String,
+        givenName: String?,
+        familyName: String?,
+        displayName: String?,
+        onResult: (AuthResult) -> Unit
+    ) {
+        val app = context.applicationContext
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+
+        auth.signInWithCredential(credential)
+            .addOnSuccessListener { result ->
+                val fbUser = result.user
+                if (fbUser == null) {
+                    onResult(AuthResult.Failure("Google sign-in failed. Please try again."))
+                    return@addOnSuccessListener
+                }
+                val uid = fbUser.uid
+                users.document(uid).get().addOnCompleteListener { task ->
+                    val snapshot = if (task.isSuccessful) task.result else null
+                    val user = when {
+                        snapshot != null && snapshot.exists() ->
+                            UserAccount.fromMap(uid, snapshot.data ?: emptyMap())
+                        else -> {
+                            val first = givenName?.takeIf { it.isNotBlank() }
+                                ?: displayName?.substringBefore(" ")?.takeIf { it.isNotBlank() }
+                                ?: fbUser.email?.substringBefore("@")
+                                ?: ""
+                            val last = familyName?.takeIf { it.isNotBlank() }
+                                ?: displayName?.substringAfter(" ", "")
+                                ?: ""
+                            val fresh = UserAccount(
+                                userId = uid,
+                                firstName = first.trim(),
+                                surname = last.trim(),
+                                email = fbUser.email ?: "",
+                                mobile = ""
+                            )
+                            // Only create the profile if we positively know it's missing.
+                            if (snapshot != null && !snapshot.exists()) pushProfile(fresh)
+                            fresh
+                        }
+                    }
+                    cacheUser(app, user)
+                    onResult(AuthResult.Success(user))
+                }
+            }
+            .addOnFailureListener { e ->
+                val message = when (e) {
+                    is FirebaseAuthInvalidCredentialsException,
+                    is FirebaseAuthInvalidUserException -> "Google sign-in failed. Please try again."
+                    else -> describe(e)
+                }
+                onResult(AuthResult.Failure(message))
+            }
+    }
+
     fun logout(context: Context) {
+        val app = context.applicationContext
         val uid = auth.currentUser?.uid
         auth.signOut()
-        if (uid != null) prefs(context).edit().remove(PROFILE_CACHE_PREFIX + uid).apply()
+        if (uid != null) prefs(app).edit().remove(PROFILE_CACHE_PREFIX + uid).apply()
+
+        // Forget the Google credential so the next Google sign-in shows the account chooser fresh.
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                CredentialManager.create(app).clearCredentialState(ClearCredentialStateRequest())
+            } catch (e: Exception) {
+                Log.w(TAG, "Clearing credential state failed", e)
+            }
+        }
     }
 
     // ---------------- Session ----------------
