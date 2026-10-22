@@ -1,10 +1,3 @@
-import java.util.Properties
-
-val localProps = Properties().apply {
-    val f = rootProject.file("local.properties")
-    if (f.exists()) f.inputStream().use { load(it) }
-}
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.services)
@@ -24,7 +17,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        resValue("string", "mapbox_access_token", localProps.getProperty("MAPBOX_PUBLIC_TOKEN") ?: "")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -59,7 +51,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-    implementation("com.mapbox.maps:android-ndk27:11.28.2")
+
+        implementation("org.maplibre.gl:android-sdk:11.11.0")
+        implementation("org.maplibre.gl:android-plugin-annotation:4.0.0") // Add this
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -1,12 +1,15 @@
 package com.example.metrogo
 
 import android.app.Application
-import com.mapbox.maps.MapboxOptions
+import org.maplibre.android.MapLibre
 
 class MetroGoApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        MapboxOptions.accessToken = getString(R.string.mapbox_access_token)
+
+        // Initialize MapLibre. No access token required.
+        MapLibre.getInstance(this)
+
         LanguageManager.init(this)
     }
 }

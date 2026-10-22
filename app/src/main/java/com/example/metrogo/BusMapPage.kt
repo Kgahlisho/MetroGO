@@ -1,6 +1,7 @@
 package com.example.metrogo
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -17,16 +18,18 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapView
-import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.locationcomponent.OnIndicatorPositionChangedListener
-import com.mapbox.maps.plugin.locationcomponent.location
+import org.maplibre.android.MapLibre
+import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.location.LocationComponentActivationOptions
+import org.maplibre.android.location.LocationComponentOptions
+import org.maplibre.android.location.modes.CameraMode
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
+import org.maplibre.android.plugins.annotation.Symbol
+import org.maplibre.android.plugins.annotation.SymbolManager
+import org.maplibre.android.plugins.annotation.SymbolOptions
 
 class BusMapPage : AppCompatActivity() {
 
@@ -40,16 +43,17 @@ class BusMapPage : AppCompatActivity() {
 
     private lateinit var mapView: MapView
     private lateinit var tvNearby: TextView
-    private lateinit var busManager: PointAnnotationManager
+    private lateinit var map: MapLibreMap
+    private lateinit var style: Style
+    private lateinit var symbolManager: SymbolManager
 
-    private val busMarkers = mutableMapOf<String, PointAnnotation>()
-    private var userPoint: Point? = null
+    private val busSymbols = mutableMapOf<String, Symbol>()
+    private var userLatLng: LatLng? = null
     private val handler = Handler(Looper.getMainLooper())
 
-    private val radiusMeters = 15_000f          // "in the vicinity"
-    private val tripSeconds = 180.0             // demo speed: one-way trip in 3 minutes
+    private val radiusMeters = 15_000f
+    private val tripSeconds = 180.0
 
-    // Approximate coordinates for the stations used in BusRouteRepository.
     private val stops = listOf(
         BusStop("PS", "Park Station", -26.2052, 28.0420),
         BusStop("RB", "Rosebank", -26.1467, 28.0436),
@@ -75,21 +79,13 @@ class BusMapPage : AppCompatActivity() {
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { result ->
             if (result.values.any { it }) {
-                enableLocation()
+                enableLocationComponent()
             } else {
                 Toast.makeText(this, "Location permission denied. Showing Johannesburg.", Toast.LENGTH_LONG).show()
                 showDefaultCamera()
                 tvNearby.text = "Allow location to see buses near you."
             }
         }
-
-    private val positionListener = object : OnIndicatorPositionChangedListener {
-        override fun onIndicatorPositionChanged(point: Point) {
-            val first = userPoint == null
-            userPoint = point
-            if (first) centerOn(point)
-        }
-    }
 
     private val ticker = object : Runnable {
         override fun run() {
@@ -100,32 +96,47 @@ class BusMapPage : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MapLibre.getInstance(this)
         setContentView(R.layout.activity_bus_map)
 
         mapView = findViewById(R.id.mapView)
         tvNearby = findViewById(R.id.tvNearby)
         findViewById<Button>(R.id.btnMapBack).setOnClickListener { finish() }
         findViewById<Button>(R.id.btnCenterMe).setOnClickListener {
-            userPoint?.let { centerOn(it) }
+            userLatLng?.let { centerOn(it) }
                 ?: Toast.makeText(this, "Still finding your location…", Toast.LENGTH_SHORT).show()
         }
 
-        // Stops (static markers)
-        val stopManager = mapView.annotations.createPointAnnotationManager()
+        mapView.onCreate(savedInstanceState)
+        mapView.getMapAsync { maplibreMap ->
+            map = maplibreMap
+            map.setStyle(Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")) { loadedStyle ->
+                style = loadedStyle
+                setupMapContent()
+            }
+        }
+    }
+
+    private fun setupMapContent() {
         val stopIcon = dot(Color.parseColor("#455A64"))
+        style.addImage("stop-icon", stopIcon)
+
+        symbolManager = SymbolManager(mapView, map, style)
+        symbolManager.iconAllowOverlap = true
+        symbolManager.textAllowOverlap = true
+
         stops.forEach { s ->
-            stopManager.create(
-                PointAnnotationOptions()
-                    .withPoint(Point.fromLngLat(s.longitude, s.latitude))
-                    .withIconImage(stopIcon)
+            symbolManager.create(
+                SymbolOptions()
+                    .withLatLng(LatLng(s.latitude, s.longitude))
+                    .withIconImage("stop-icon")
                     .withTextField(s.stopName)
-                    .withTextSize(11.0)
-                    .withTextOffset(listOf(0.0, 1.6))
+                    .withTextSize(11f)
+                    .withTextOffset(arrayOf(0f, 1.6f))
             )
         }
 
-        // Buses (moving markers)
-        busManager = mapView.annotations.createPointAnnotationManager()
+        style.addImage("bus-icon", busIconBitmap)
 
         showDefaultCamera()
         requestLocation()
@@ -133,26 +144,46 @@ class BusMapPage : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
+        mapView.onStart()
         handler.post(ticker)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView.onResume()
+    }
+
+    override fun onPause() {
+        mapView.onPause()
+        super.onPause()
     }
 
     override fun onStop() {
         handler.removeCallbacks(ticker)
+        mapView.onStop()
         super.onStop()
     }
 
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
     override fun onDestroy() {
-        mapView.location.removeOnIndicatorPositionChangedListener(positionListener)
+        mapView.onDestroy()
         super.onDestroy()
     }
 
-    // ---------------- Location ----------------
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView.onSaveInstanceState(outState)
+    }
 
     private fun requestLocation() {
         val fine = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
         val coarse = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         if (fine == PackageManager.PERMISSION_GRANTED || coarse == PackageManager.PERMISSION_GRANTED) {
-            enableLocation()
+            enableLocationComponent()
         } else {
             permissionLauncher.launch(
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -160,74 +191,97 @@ class BusMapPage : AppCompatActivity() {
         }
     }
 
-    private fun enableLocation() {
-        mapView.location.updateSettings {
-            enabled = true
-            pulsingEnabled = true
-        }
-        mapView.location.addOnIndicatorPositionChangedListener(positionListener)
+    @SuppressLint("MissingPermission")
+    private fun enableLocationComponent() {
+        val locationComponent = map.locationComponent
+        val activationOptions = LocationComponentActivationOptions.builder(this, style)
+            .locationComponentOptions(
+                LocationComponentOptions.builder(this)
+                    .pulseEnabled(true)
+                    .build()
+            )
+            .useDefaultLocationEngine(true)
+            .build()
+
+        locationComponent.activateLocationComponent(activationOptions)
+        locationComponent.isLocationComponentEnabled = true
+        locationComponent.cameraMode = CameraMode.NONE
+
+        handler.post(object : Runnable {
+            override fun run() {
+                val loc = locationComponent.lastKnownLocation
+                if (loc != null) {
+                    val newLatLng = LatLng(loc.latitude, loc.longitude)
+                    val first = userLatLng == null
+                    userLatLng = newLatLng
+                    if (first) centerOn(newLatLng)
+                }
+                handler.postDelayed(this, 1000)
+            }
+        })
     }
 
-    private fun centerOn(point: Point) {
-        mapView.mapboxMap.setCamera(
-            CameraOptions.Builder().center(point).zoom(12.0).build()
-        )
+    private fun centerOn(latLng: LatLng) {
+        map.cameraPosition = CameraPosition.Builder()
+            .target(latLng)
+            .zoom(12.0)
+            .build()
     }
 
     private fun showDefaultCamera() {
-        mapView.mapboxMap.setCamera(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(28.0473, -26.2041))   // Johannesburg
-                .zoom(9.5)
-                .build()
-        )
+        map.cameraPosition = CameraPosition.Builder()
+            .target(LatLng(-26.2041, 28.0473))
+            .zoom(9.5)
+            .build()
     }
 
-    // ---------------- Simulated buses ----------------
-
-    private fun posOf(b: SimBus): Point {
+    private fun posOf(b: SimBus): LatLng {
         val t = ((SystemClock.elapsedRealtime() / 1000.0 + b.offsetSeconds) % (tripSeconds * 2)) / tripSeconds
-        val f = if (t <= 1.0) t else 2.0 - t          // there and back
+        val f = if (t <= 1.0) t else 2.0 - t
         val lat = b.from.latitude + (b.to.latitude - b.from.latitude) * f
         val lng = b.from.longitude + (b.to.longitude - b.from.longitude) * f
-        return Point.fromLngLat(lng, lat)
+        return LatLng(lat, lng)
     }
 
-    private fun distanceMeters(a: Point, b: Point): Float {
+    private fun distanceMeters(a: LatLng, b: LatLng): Float {
         val out = FloatArray(1)
-        Location.distanceBetween(a.latitude(), a.longitude(), b.latitude(), b.longitude(), out)
+        Location.distanceBetween(a.latitude, a.longitude, b.latitude, b.longitude, out)
         return out[0]
     }
 
     private fun updateBuses() {
-        val busIcon = busIconBitmap
         val nearby = mutableListOf<Pair<SimBus, Float>>()
 
         buses.forEach { bus ->
             val p = posOf(bus)
             val key = bus.label + bus.registration
-            val marker = busMarkers[key]
-            if (marker == null) {
-                busMarkers[key] = busManager.create(
-                    PointAnnotationOptions()
-                        .withPoint(p)
-                        .withIconImage(busIcon)
+            val existing = busSymbols[key]
+
+            if (existing == null) {
+                val symbol = symbolManager.create(
+                    SymbolOptions()
+                        .withLatLng(p)
+                        .withIconImage("bus-icon")
                         .withTextField(bus.label)
-                        .withTextSize(11.0)
-                        .withTextOffset(listOf(0.0, -1.8))
+                        .withTextSize(11f)
+                        .withTextOffset(arrayOf(0f, -1.8f))
                 )
+                if (symbol != null) {
+                    busSymbols[key] = symbol
+                }
             } else {
-                marker.point = p
-                busManager.update(marker)
+                existing.latLng = p
+                symbolManager.update(existing)
             }
-            userPoint?.let { u ->
+
+            userLatLng?.let { u ->
                 val d = distanceMeters(u, p)
                 if (d <= radiusMeters) nearby += bus to d
             }
         }
 
         tvNearby.text = when {
-            userPoint == null -> "Finding your location…"
+            userLatLng == null -> "Finding your location…"
             nearby.isEmpty() ->
                 "No buses within ${(radiusMeters / 1000).toInt()} km of you.\n" +
                         "(On an emulator? Set its location to Johannesburg in Extended controls → Location.)"
@@ -236,8 +290,6 @@ class BusMapPage : AppCompatActivity() {
             }
         }
     }
-
-    // ---------------- Marker bitmaps ----------------
 
     private val busIconBitmap: Bitmap by lazy { dot(Color.parseColor("#00897B"), 64) }
 
