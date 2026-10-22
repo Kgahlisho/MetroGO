@@ -18,8 +18,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import org.maplibre.android.MapLibre
 import org.maplibre.android.camera.CameraPosition
+import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.location.LocationComponentActivationOptions
 import org.maplibre.android.location.LocationComponentOptions
@@ -49,10 +49,15 @@ class BusMapPage : AppCompatActivity() {
 
     private val busSymbols = mutableMapOf<String, Symbol>()
     private var userLatLng: LatLng? = null
+    private var locationEnabled = false
     private val handler = Handler(Looper.getMainLooper())
 
     private val radiusMeters = 15_000f
     private val tripSeconds = 180.0
+
+    // Must exist in the glyphs of the style you load. If labels go blank after
+    // changing the style URL, change this to a font that style provides.
+    private val textFont = arrayOf("Noto Sans Regular")
 
     private val stops = listOf(
         BusStop("PS", "Park Station", -26.2052, 28.0420),
@@ -94,9 +99,22 @@ class BusMapPage : AppCompatActivity() {
         }
     }
 
+    private val locationPoller = object : Runnable {
+        override fun run() {
+            val loc = if (::map.isInitialized) map.locationComponent.lastKnownLocation else null
+            if (loc != null) {
+                val newLatLng = LatLng(loc.latitude, loc.longitude)
+                val first = userLatLng == null
+                userLatLng = newLatLng
+                if (first) centerOn(newLatLng)
+            }
+            handler.postDelayed(this, 1000)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MapLibre.getInstance(this)
+        // MapLibre.getInstance() is already called in MetroGoApp.
         setContentView(R.layout.activity_bus_map)
 
         mapView = findViewById(R.id.mapView)
@@ -110,7 +128,7 @@ class BusMapPage : AppCompatActivity() {
         mapView.onCreate(savedInstanceState)
         mapView.getMapAsync { maplibreMap ->
             map = maplibreMap
-            map.setStyle(Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")) { loadedStyle ->
+            map.setStyle(Style.Builder().fromUri("https://tiles.openfreemap.org/styles/liberty")) { loadedStyle ->
                 style = loadedStyle
                 setupMapContent()
             }
@@ -131,6 +149,7 @@ class BusMapPage : AppCompatActivity() {
                     .withLatLng(LatLng(s.latitude, s.longitude))
                     .withIconImage("stop-icon")
                     .withTextField(s.stopName)
+                    .withTextFont(textFont)
                     .withTextSize(11f)
                     .withTextOffset(arrayOf(0f, 1.6f))
             )
@@ -146,6 +165,10 @@ class BusMapPage : AppCompatActivity() {
         super.onStart()
         mapView.onStart()
         handler.post(ticker)
+        if (locationEnabled) {
+            handler.removeCallbacks(locationPoller)
+            handler.post(locationPoller)
+        }
     }
 
     override fun onResume() {
@@ -160,6 +183,7 @@ class BusMapPage : AppCompatActivity() {
 
     override fun onStop() {
         handler.removeCallbacks(ticker)
+        handler.removeCallbacks(locationPoller)
         mapView.onStop()
         super.onStop()
     }
@@ -170,6 +194,8 @@ class BusMapPage : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        handler.removeCallbacksAndMessages(null)
+        if (::symbolManager.isInitialized) symbolManager.onDestroy()
         mapView.onDestroy()
         super.onDestroy()
     }
@@ -207,25 +233,20 @@ class BusMapPage : AppCompatActivity() {
         locationComponent.isLocationComponentEnabled = true
         locationComponent.cameraMode = CameraMode.NONE
 
-        handler.post(object : Runnable {
-            override fun run() {
-                val loc = locationComponent.lastKnownLocation
-                if (loc != null) {
-                    val newLatLng = LatLng(loc.latitude, loc.longitude)
-                    val first = userLatLng == null
-                    userLatLng = newLatLng
-                    if (first) centerOn(newLatLng)
-                }
-                handler.postDelayed(this, 1000)
-            }
-        })
+        locationEnabled = true
+        handler.removeCallbacks(locationPoller)
+        handler.post(locationPoller)
     }
 
     private fun centerOn(latLng: LatLng) {
-        map.cameraPosition = CameraPosition.Builder()
-            .target(latLng)
-            .zoom(12.0)
-            .build()
+        map.animateCamera(
+            CameraUpdateFactory.newCameraPosition(
+                CameraPosition.Builder()
+                    .target(latLng)
+                    .zoom(12.0)
+                    .build()
+            )
+        )
     }
 
     private fun showDefaultCamera() {
@@ -250,6 +271,9 @@ class BusMapPage : AppCompatActivity() {
     }
 
     private fun updateBuses() {
+        // The ticker starts in onStart(), before the map style has finished loading.
+        if (!::symbolManager.isInitialized) return
+
         val nearby = mutableListOf<Pair<SimBus, Float>>()
 
         buses.forEach { bus ->
@@ -263,6 +287,7 @@ class BusMapPage : AppCompatActivity() {
                         .withLatLng(p)
                         .withIconImage("bus-icon")
                         .withTextField(bus.label)
+                        .withTextFont(textFont)
                         .withTextSize(11f)
                         .withTextOffset(arrayOf(0f, -1.8f))
                 )

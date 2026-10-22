@@ -1,8 +1,15 @@
 package com.example.metrogo
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -15,6 +22,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import org.maplibre.android.camera.CameraUpdateFactory
+import org.maplibre.android.geometry.LatLng
+import org.maplibre.android.geometry.LatLngBounds
+import org.maplibre.android.maps.MapLibreMap
+import org.maplibre.android.maps.MapLibreMapOptions
+import org.maplibre.android.maps.MapView
+import org.maplibre.android.maps.Style
+import org.maplibre.android.plugins.annotation.LineManager
+import org.maplibre.android.plugins.annotation.LineOptions
+import org.maplibre.android.plugins.annotation.SymbolManager
+import org.maplibre.android.plugins.annotation.SymbolOptions
 
 class JourneyPlanner : AppCompatActivity() {
 
@@ -29,6 +47,24 @@ class JourneyPlanner : AppCompatActivity() {
     private lateinit var tvNoMatches: TextView
     private lateinit var rvMatchingBuses: RecyclerView
     private lateinit var rvOtherBuses: RecyclerView
+
+    // Map
+    private var mapView: MapView? = null
+    private var map: MapLibreMap? = null
+    private var symbolManager: SymbolManager? = null
+    private var lineManager: LineManager? = null
+    private var mapReady = false
+
+    // Must exist in the glyphs of the style you load. If labels go blank after
+    // changing the style URL, change this to a font that style provides.
+    private val textFont = arrayOf("Noto Sans Regular")
+
+    private companion object {
+        const val STYLE_URL = "https://tiles.openfreemap.org/styles/liberty"
+        const val ICON_STOP = "planner-stop-icon"
+        const val ICON_FROM = "planner-from-icon"
+        const val ICON_TO = "planner-to-icon"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +96,7 @@ class JourneyPlanner : AppCompatActivity() {
         }
 
         initViews()
+        setupMap(savedInstanceState)
         setupClickListeners()
         setupBusLists()
 
@@ -80,6 +117,125 @@ class JourneyPlanner : AppCompatActivity() {
         rvMatchingBuses = findViewById(R.id.rvMatchingBuses)
         rvOtherBuses = findViewById(R.id.rvOtherBuses)
     }
+
+    // ---------------------------------------------------------------- map
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupMap(savedInstanceState: Bundle?) {
+        val container = findViewById<FrameLayout>(R.id.mapContainer)
+
+        // Texture mode renders correctly inside a scrolling parent (and respects the
+        // container's rounded corners). MapLibre.getInstance() is called in MetroGoApp.
+        val options = MapLibreMapOptions.createFromAttributes(this, null).textureMode(true)
+        val mv = MapView(this, options)
+        container.addView(
+            mv,
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+        mapView = mv
+
+        // The map sits inside a NestedScrollView. Without this, dragging the map would
+        // scroll the page instead of panning the map.
+        mv.setOnTouchListener { v, event ->
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN ->
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL ->
+                    v.parent?.requestDisallowInterceptTouchEvent(false)
+            }
+            false
+        }
+
+        mv.onCreate(savedInstanceState)
+        mv.getMapAsync { maplibreMap ->
+            map = maplibreMap
+            maplibreMap.setStyle(Style.Builder().fromUri(STYLE_URL)) { style ->
+                style.addImage(ICON_STOP, dot(Color.parseColor("#455A64"), 36))
+                style.addImage(ICON_FROM, dot(Color.parseColor("#00897B"), 64))
+                style.addImage(ICON_TO, dot(Color.parseColor("#D32F2F"), 64))
+
+                // Line manager first so the route line is drawn underneath the stop markers.
+                lineManager = LineManager(mv, maplibreMap, style)
+                symbolManager = SymbolManager(mv, maplibreMap, style).apply {
+                    iconAllowOverlap = true
+                    textAllowOverlap = true
+                }
+
+                mapReady = true
+                updateMap(tvFromStation.text.toString(), tvToStation.text.toString())
+            }
+        }
+    }
+
+    /**
+     * Redraws the stops for the current selection: every stop as a small dot, the From stop
+     * in teal, the To stop in red, a straight line between them, and the camera fitted to both.
+     */
+    private fun updateMap(from: String, to: String) {
+        if (!mapReady) return
+        val m = map ?: return
+        val sm = symbolManager ?: return
+        val lm = lineManager ?: return
+
+        sm.deleteAll()
+        lm.deleteAll()
+
+        val stops = TransportRouteRepository.busStops
+        val fromStop = stops.find { it.stopName.equals(from, ignoreCase = true) }
+        val toStop = stops.find { it.stopName.equals(to, ignoreCase = true) }
+
+        stops.forEach { s ->
+            val icon = when (s.stopId) {
+                fromStop?.stopId -> ICON_FROM
+                toStop?.stopId -> ICON_TO
+                else -> ICON_STOP
+            }
+            sm.create(
+                SymbolOptions()
+                    .withLatLng(LatLng(s.latitude, s.longitude))
+                    .withIconImage(icon)
+                    .withTextField(s.stopName)
+                    .withTextFont(textFont)
+                    .withTextSize(11f)
+                    .withTextOffset(arrayOf(0f, 1.6f))
+            )
+        }
+
+        val points: List<LatLng>
+        if (fromStop != null && toStop != null && fromStop.stopId != toStop.stopId) {
+            val a = LatLng(fromStop.latitude, fromStop.longitude)
+            val b = LatLng(toStop.latitude, toStop.longitude)
+            lm.create(
+                LineOptions()
+                    .withLatLngs(listOf(a, b))
+                    .withLineColor("#00897B")
+                    .withLineWidth(4f)
+            )
+            points = listOf(a, b)
+        } else {
+            // Nothing valid selected: show every stop.
+            points = stops.map { LatLng(it.latitude, it.longitude) }
+        }
+
+        val bounds = LatLngBounds.Builder().apply { points.forEach { include(it) } }.build()
+        m.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 120), 600)
+    }
+
+    private fun dot(color: Int, size: Int): Bitmap {
+        val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        val p = Paint(Paint.ANTI_ALIAS_FLAG)
+        p.color = Color.WHITE
+        c.drawCircle(size / 2f, size / 2f, size / 2f, p)
+        p.color = color
+        c.drawCircle(size / 2f, size / 2f, size / 2f - 6f, p)
+        return bmp
+    }
+
+    // ---------------------------------------------------------------- planner
 
     private fun setupClickListeners() {
         inputFrom.setOnClickListener {
@@ -162,11 +318,52 @@ class JourneyPlanner : AppCompatActivity() {
         rvOtherBuses.adapter = BusRouteAdapter(otherRoutes) { selected ->
             openPayment(selected)
         }
+
+        updateMap(from, to)
     }
 
     private fun openPayment(selected: TransportRouteRepository.ScheduleDetails) {
         val intent = Intent(this, PaymentActivity::class.java)
         intent.putExtra(PaymentActivity.EXTRA_SCHEDULE_ID, selected.schedule.scheduleId)
         startActivity(intent)
+    }
+
+    // ---------------------------------------------------------------- map lifecycle
+
+    override fun onStart() {
+        super.onStart()
+        mapView?.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mapView?.onResume()
+    }
+
+    override fun onPause() {
+        mapView?.onPause()
+        super.onPause()
+    }
+
+    override fun onStop() {
+        mapView?.onStop()
+        super.onStop()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView?.onLowMemory()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mapView?.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroy() {
+        symbolManager?.onDestroy()
+        lineManager?.onDestroy()
+        mapView?.onDestroy()
+        super.onDestroy()
     }
 }

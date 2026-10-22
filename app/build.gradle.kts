@@ -52,9 +52,8 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
 
-        implementation("org.maplibre.gl:android-sdk:11.11.0")
-        implementation("org.maplibre.gl:android-plugin-annotation:4.0.0") // Add this
-
+    implementation("org.maplibre.gl:android-sdk:11.11.0")
+    implementation("org.maplibre.gl:android-plugin-annotation-v9:3.0.2")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

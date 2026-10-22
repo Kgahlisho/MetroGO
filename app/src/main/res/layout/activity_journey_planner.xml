@@ -250,6 +250,15 @@
                 app:backgroundTint="@color/teal_primary"
                 app:cornerRadius="12dp" />
 
+            <!-- Route map: the MapView is added to this container from JourneyPlanner.kt -->
+            <FrameLayout
+                android:id="@+id/mapContainer"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_card_white"
+                android:clipToOutline="true" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
