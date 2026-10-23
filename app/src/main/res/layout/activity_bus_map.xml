@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -8,48 +10,250 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/btnMapBack"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="48dp"
-        android:text="Back"
-        android:textAllCaps="false" />
-
+    <!-- TOP: back + live pill + line filter chips + "following" pill -->
     <LinearLayout
+        android:id="@+id/topStack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:id="@+id/btnMapBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_fab"
+                android:clickable="true"
+                android:contentDescription="Back"
+                android:elevation="6dp"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_arrow_back"
+                    app:tint="@color/black" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_card_white"
+                android:elevation="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="10dp">
+
+                <View
+                    android:id="@+id/liveDot"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:accessibilityHeading="true"
+                    android:text="Live buses"
+                    android:textColor="@color/black"
+                    android:textSize="15sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvLiveCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/text_gray"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:clipToPadding="false"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/chipRow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/tvFollowing"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_pill_teal"
+            android:clickable="true"
+            android:elevation="6dp"
+            android:focusable="true"
+            android:gravity="center"
+            android:paddingHorizontal="18dp"
+            android:textColor="#FFFFFFFF"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- BOTTOM: floating buttons sit on top of the bus-card panel -->
+    <LinearLayout
+        android:id="@+id/bottomStack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_margin="12dp"
-        android:background="@drawable/bg_card_white"
-        android:elevation="8dp"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <TextView
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Buses near you"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:layout_gravity="end"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvNearby"
+            <TextView
+                android:id="@+id/fabTilt"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_fab"
+                android:clickable="true"
+                android:contentDescription="Toggle 3D view"
+                android:elevation="6dp"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="3D"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <FrameLayout
+                android:id="@+id/fabFitAll"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_fab"
+                android:clickable="true"
+                android:contentDescription="Show all routes"
+                android:elevation="6dp"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_route"
+                    app:tint="@color/black" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fabSpeak"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_fab"
+                android:clickable="true"
+                android:contentDescription="Read nearest bus aloud"
+                android:elevation="6dp"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_volume_up"
+                    app:tint="@color/black" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/fabCenterMe"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_circle_teal"
+                android:clickable="true"
+                android:contentDescription="Centre map on my location"
+                android:elevation="6dp"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_my_location"
+                    app:tint="#FFFFFFFF" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Finding your location…"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
+            android:background="@drawable/bg_panel_top"
+            android:elevation="12dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="12dp">
 
-        <Button
-            android:id="@+id/btnCenterMe"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Centre on me"
-            android:textAllCaps="false" />
+            <FrameLayout
+                android:id="@+id/panelHandle"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:contentDescription="Show or hide the bus list"
+                android:focusable="true">
+
+                <View
+                    android:layout_width="44dp"
+                    android:layout_height="5dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_handle"
+                    android:importantForAccessibility="no" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:accessibilityHeading="true"
+                android:text="Buses near you"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvNearby"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Finding your location…"
+                android:textColor="@color/text_gray"
+                android:textSize="12sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBuses"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clipToPadding="false" />
+        </LinearLayout>
     </LinearLayout>
 </FrameLayout>

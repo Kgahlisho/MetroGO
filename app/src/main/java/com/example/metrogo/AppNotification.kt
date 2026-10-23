@@ -4,6 +4,7 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
+import android.provider.Settings
 
 data class AppNotification(
     val id: String,

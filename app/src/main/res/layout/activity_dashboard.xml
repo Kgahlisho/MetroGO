@@ -221,10 +221,12 @@
 
             <!-- BOARDING PASS CARD  -->
             <TextView
+                android:id="@+id/tvBoardingTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="8dp"
+                android:accessibilityHeading="true"
                 android:text="Boarding pass"
                 android:textColor="@color/text_gray"
                 android:textSize="12sp"
@@ -290,12 +292,119 @@
                     app:layout_constraintStart_toEndOf="@id/divider"
                     app:layout_constraintTop_toTopOf="@id/BoardingCode" />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- LIVE MAP CARD -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mapCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card_dark"
+                android:clickable="true"
+                android:contentDescription="Live bus map. Opens a map showing buses moving near you."
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:minHeight="156dp"
+                android:padding="14dp">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/mapGuide"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
+
+                <LinearLayout
+                    android:id="@+id/mapLiveRow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <View
+                        android:layout_width="8dp"
+                        android:layout_height="8dp"
+                        android:background="@drawable/bg_circle_lime"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:importantForAccessibility="no"
+                        android:letterSpacing="0.1"
+                        android:text="LIVE"
+                        android:textColor="#FFFFFFFF"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvMapCardTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:importantForAccessibility="no"
+                    android:text="Live bus map"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/mapGuide"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/mapLiveRow" />
+
+                <TextView
+                    android:id="@+id/tvMapCardSub"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:alpha="0.8"
+                    android:importantForAccessibility="no"
+                    android:text="Watch buses move in real time"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toStartOf="@id/mapGuide"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvMapCardTitle" />
+
+                <TextView
+                    android:id="@+id/tvMapCardCta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_pill_teal"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:minHeight="40dp"
+                    android:paddingHorizontal="16dp"
+                    android:text="Open map  \u2192"
+                    android:textColor="#FFFFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tvMapCardSub" />
+
+                <com.example.metrogo.MiniMapPreviewView
+                    android:id="@+id/miniMap"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="10dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/mapGuide"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <!-- QUICK ACTIONS  -->
             <TextView
+                android:id="@+id/tvQuickTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="8dp"
+                android:accessibilityHeading="true"
                 android:text="Quick actions"
                 android:textColor="@color/text_gray"
                 android:textSize="12sp"
@@ -463,6 +572,8 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

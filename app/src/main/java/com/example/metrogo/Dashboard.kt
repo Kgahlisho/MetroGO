@@ -22,8 +22,13 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.content.ContextCompat
+import androidx.core.view.AccessibilityDelegateCompat
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 
-class Dashboard : AppCompatActivity() {
+
+
+class Dashboard : AccessibleActivity() {
 
     private val currencyFormat = DecimalFormat("#,##0.00")
 
@@ -43,6 +48,7 @@ class Dashboard : AppCompatActivity() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
+
             return
         }
 
@@ -98,6 +104,10 @@ class Dashboard : AppCompatActivity() {
             val intent = Intent(this , JourneyPlanner::class.java)
             startActivity(intent)
         }
+
+        setupMapCard()
+        applyContentDescriptions()
+        if (AccessibilitySettings.isHighContrast(this)) applyHighContrast()
     }
 
     override fun onResume() {
@@ -271,5 +281,58 @@ class Dashboard : AppCompatActivity() {
         )
         LanguageManager.translateDialog(dialog)
         dialog.show()
+    }
+
+    private fun setupMapCard() {
+        findViewById<View>(R.id.mapCard).setOnClickListener {
+            startActivity(Intent(this, BusMapPage::class.java))
+        }
+        val running = BusRouteRepository.sampleRoutes
+            .distinctBy { Triple(it.transportName, it.origin, it.destination) }.size
+        findViewById<TextView>(R.id.tvMapCardSub).text = "$running buses moving right now"
+    }
+
+    /** TalkBack: name the icon-only controls and announce them as buttons. */
+    private fun applyContentDescriptions() {
+        mapOf(
+            R.id.circleProfile to "Profile",
+            R.id.circleSettings to "Settings",
+            R.id.circleNotification to "Notifications",
+            R.id.pillTravelHistory to "Travel history",
+            R.id.pillWallet to "Wallet",
+            R.id.pillPurchaseTicket to "Purchase ticket",
+            R.id.pillJourneyPlanner to "Journey planner",
+            R.id.mapCard to "Live bus map. Opens a map showing buses moving near you."
+        ).forEach { (id, description) ->
+            val v = findViewById<View>(id)
+            v.contentDescription = description
+            ViewCompat.setAccessibilityDelegate(v, object : AccessibilityDelegateCompat() {
+                override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                    super.onInitializeAccessibilityNodeInfo(host, info)
+                    info.className = "android.widget.Button"
+                }
+            })
+        }
+    }
+
+    /** Heavier borders and pure black/white text (set in Preferences). */
+    private fun applyHighContrast() {
+        listOf(
+            R.id.boardingPass, R.id.pillTravelHistory, R.id.pillWallet,
+            R.id.pillPurchaseTicket, R.id.pillJourneyPlanner
+        ).forEach { findViewById<View>(it).setBackgroundResource(R.drawable.bg_card_hc) }
+
+        listOf(R.id.welcomeCard, R.id.balanceCard, R.id.mapCard)
+            .forEach { findViewById<View>(it).setBackgroundResource(R.drawable.bg_card_dark_hc) }
+
+        val black = ContextCompat.getColor(this, R.color.black)
+        listOf(R.id.tvBoardingTitle, R.id.tvQuickTitle)
+            .forEach { findViewById<TextView>(it).setTextColor(black) }
+
+        // Un-dim the faded labels on the dark cards.
+        findViewById<TextView>(R.id.tvWelcomeLabel).alpha = 1f
+        findViewById<TextView>(R.id.tvBalanceLabel).alpha = 1f
+        findViewById<TextView>(R.id.tvCreditCaption).alpha = 1f
+        findViewById<TextView>(R.id.tvMapCardSub).alpha = 1f
     }
 }

@@ -3,6 +3,7 @@ package com.example.metrogo
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -12,30 +13,30 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import java.text.DecimalFormat
 
-class PreferencesPage : AppCompatActivity() {
+class PreferencesPage : AccessibleActivity() {
 
     private lateinit var prefs: SharedPreferences
+    private var speaker: Speaker? = null
 
-    private val textSizes = arrayOf("Small", "Medium", "Large")
+    private val textSizes = AccessibilitySettings.textSizes
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 2. Setup preferences
         prefs = getSharedPreferences("metrogo_prefs", MODE_PRIVATE)
 
-        // 3. Apply the saved theme preference BEFORE setting the content view
+        // Apply the saved theme preference BEFORE setting the content view
         val isDark = prefs.getBoolean("dark_theme", false)
         AppCompatDelegate.setDefaultNightMode(
             if (isDark) AppCompatDelegate.MODE_NIGHT_YES
             else AppCompatDelegate.MODE_NIGHT_NO
         )
-
 
         enableEdgeToEdge()
         setContentView(R.layout.activity_preferences_page)
@@ -47,31 +48,22 @@ class PreferencesPage : AppCompatActivity() {
         }
 
         // Top bar navigation
-        val circleSettings = findViewById<FrameLayout>(R.id.circleSettings)
-        circleSettings.setOnClickListener {
+        findViewById<FrameLayout>(R.id.circleSettings).setOnClickListener {
             startActivity(Intent(this, SettingsPage::class.java))
         }
-
-        val circleProfile = findViewById<FrameLayout>(R.id.circleProfile)
-        circleProfile.setOnClickListener {
+        findViewById<FrameLayout>(R.id.circleProfile).setOnClickListener {
             startActivity(Intent(this, ProfileManagement::class.java))
         }
-
-        val circleNotification = findViewById<FrameLayout>(R.id.circleNotification)
-        circleNotification.setOnClickListener {
+        findViewById<FrameLayout>(R.id.circleNotification).setOnClickListener {
             startActivity(Intent(this, NotificationPage::class.java))
         }
+        findViewById<ImageButton>(R.id.btnBack).setOnClickListener { finish() }
 
-        val btnBack = findViewById<ImageButton>(R.id.btnBack)
-        btnBack.setOnClickListener {
-            finish()
-        }
-
-       val tvLanguageValue = findViewById<TextView>(R.id.tvLanguageValue)
+        // ---- Language ----
+        val tvLanguageValue = findViewById<TextView>(R.id.tvLanguageValue)
         tvLanguageValue.text = LanguageManager.getSelected().nativeName
 
-        val rowLanguage = findViewById<LinearLayout>(R.id.rowLanguage)
-        rowLanguage.setOnClickListener {
+        findViewById<LinearLayout>(R.id.rowLanguage).setOnClickListener {
             val options = LanguageManager.languages
             val current = options
                 .indexOfFirst { it.code == LanguageManager.getSelected().code }
@@ -89,56 +81,107 @@ class PreferencesPage : AppCompatActivity() {
                 .show()
         }
 
-        // 7. App Theme (Light / Dark)
+        // ---- App Theme (Light / Dark) ----
         val switchTheme = findViewById<Switch>(R.id.switchTheme)
         val ivThemeIcon = findViewById<ImageView>(R.id.ivThemeIcon)
         switchTheme.isChecked = isDark
         ivThemeIcon.setImageResource(if (isDark) R.drawable.ic_moon else R.drawable.ic_sun)
 
         switchTheme.setOnCheckedChangeListener { _, isChecked ->
-            // Save the preference FIRST
             prefs.edit().putBoolean("dark_theme", isChecked).apply()
-
             ivThemeIcon.setImageResource(if (isChecked) R.drawable.ic_moon else R.drawable.ic_sun)
-
-            // Then apply the theme change (this will recreate the Activity)
+            // This recreates the Activity
             AppCompatDelegate.setDefaultNightMode(
                 if (isChecked) AppCompatDelegate.MODE_NIGHT_YES
                 else AppCompatDelegate.MODE_NIGHT_NO
             )
         }
 
-        // 8. Text Size
+        // ---- Text Size (now actually applied) ----
         val tvTextSizeValue = findViewById<TextView>(R.id.tvTextSizeValue)
-        tvTextSizeValue.text = prefs.getString("text_size", "Medium")
+        tvTextSizeValue.text = AccessibilitySettings.textSize(this)
 
-        val rowTextSize = findViewById<LinearLayout>(R.id.rowTextSize)
-        rowTextSize.setOnClickListener {
-            val current = textSizes.indexOf(prefs.getString("text_size", "Medium")).coerceAtLeast(0)
+        findViewById<LinearLayout>(R.id.rowTextSize).setOnClickListener {
+            val current = textSizes.indexOf(AccessibilitySettings.textSize(this)).coerceAtLeast(0)
             AlertDialog.Builder(this)
                 .setTitle(LanguageManager.tr("Text Size"))
                 .setSingleChoiceItems(
                     textSizes.map { LanguageManager.tr(it) }.toTypedArray(), current
                 ) { dialog, which ->
                     val selected = textSizes[which]
-                    tvTextSizeValue.text = selected
-                    prefs.edit().putString("text_size", selected).apply()
-                       dialog.dismiss()
+                    dialog.dismiss()
+                    if (selected != AccessibilitySettings.textSize(this)) {
+                        AccessibilitySettings.setTextSize(this, selected)
+                        recreate()   // re-applies the font scale to this screen immediately
+                    }
                 }
                 .setNegativeButton(LanguageManager.tr("Cancel"), null)
                 .show()
         }
 
-         val switchHighContrast = findViewById<Switch>(R.id.switchHighContrast)
-        switchHighContrast.isChecked = prefs.getBoolean("high_contrast", false)
+        // ---- High Contrast (now actually applied) ----
+        val switchHighContrast = findViewById<Switch>(R.id.switchHighContrast)
+        switchHighContrast.isChecked = AccessibilitySettings.isHighContrast(this)   // BEFORE the listener
         switchHighContrast.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("high_contrast", isChecked).apply()
-               }
+            AccessibilitySettings.setHighContrast(this, isChecked)
+            recreate()
+        }
 
+        // ---- Reduce Motion ----
+        val switchReduceMotion = findViewById<Switch>(R.id.switchReduceMotion)
+        switchReduceMotion.isChecked = AccessibilitySettings.isReduceMotionPref(this)
+        switchReduceMotion.setOnCheckedChangeListener { _, isChecked ->
+            AccessibilitySettings.setReduceMotion(this, isChecked)
+        }
 
+        // ---- Read Aloud ----
+        findViewById<View>(R.id.rowReadAloud).setOnClickListener { readSummaryAloud() }
+
+        if (AccessibilitySettings.isHighContrast(this)) applyHighContrast()
     }
 
-      private fun changeLanguage(language: LanguageManager.Language, label: TextView) {
+    private fun readSummaryAloud() {
+        val balance = TransportCardManager.getBalance(this)
+        val ticket = TicketStore.getActiveTicket(this)
+        val details = ticket?.let { TransportRouteRepository.scheduleDetails(it.scheduleId) }
+        val text = buildString {
+            append("Your balance is ${DecimalFormat("#,##0.00").format(balance)} rand. ")
+            if (details != null) {
+                append(
+                    "Active boarding pass: ${details.route.routeName}, from ${details.originStop.stopName} " +
+                            "to ${details.destinationStop.stopName}. Departs ${details.schedule.departureTime}, " +
+                            "bus ${details.schedule.busRegistration}."
+                )
+            } else {
+                append("You have no active boarding pass.")
+            }
+        }
+        (speaker ?: Speaker(this).also { speaker = it }).speak(text)
+    }
+
+    /** Heavier borders and pure black/white text. Toggling the switch recreates the screen, so no "undo" is needed. */
+    private fun applyHighContrast() {
+        listOf(R.id.cardPreferences, R.id.cardAccessibility)
+            .forEach { findViewById<View>(it).setBackgroundResource(R.drawable.bg_card_hc) }
+
+        val black = ContextCompat.getColor(this, R.color.black)
+        listOf(
+            R.id.tvSectionDisplay, R.id.tvSectionAccessibility,
+            R.id.tvLanguageValue, R.id.tvTextSizeValue, R.id.tvReduceMotionHint
+        ).forEach { findViewById<TextView>(it).setTextColor(black) }
+    }
+
+    override fun onStop() {
+        speaker?.stop()
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        speaker?.shutdown(); speaker = null
+        super.onDestroy()
+    }
+
+    private fun changeLanguage(language: LanguageManager.Language, label: TextView) {
         if (language.code == LanguageManager.getSelected().code) return
 
         if (!language.isEnglish) {
@@ -165,5 +208,4 @@ class PreferencesPage : AppCompatActivity() {
             }
         }
     }
-
 }
